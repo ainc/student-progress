@@ -17,6 +17,8 @@ class Coach(models.Model):
 	class Meta:
 		verbose_name_plural = "Coaches"
 
+
+
 #Student table
 class Student(models.Model):
 	student_id = models.AutoField(primary_key=True)
@@ -29,6 +31,25 @@ class Student(models.Model):
 		to_string += ' '
 		to_string += self.last_name
 		return to_string
+
+#A student profile which will contain information about a student
+class StudProfile(models.Model):
+	profile_id = models.AutoField(primary_key=True)
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	email = models.EmailField(max_length=60, blank=False)
+	phone = models.IntegerField()
+	github_user_name = models.CharField(max_length=30)
+	bio = models.CharField(max_length=140)
+
+	class Meta:
+		verbose_name_plural = "Student profiles"
+
+
+#Table for a student's parents/guardian
+class StudentGuardian(models.Model):
+	guardian_id = models.AutoField(primary_key=True)
+	name = models.CharField(max_length=200)
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 
 #Class table 
 class Class(models.Model):
