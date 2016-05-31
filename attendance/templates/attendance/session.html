@@ -2,8 +2,8 @@
 
 {% block content %}   
     <div class="table-data">
-
-        <h1> {{class}} with {{coach}}</h1>
+        
+        <h1> {{session}} </h1>
 
         <table class="pure-table center pure-table-horizontal">
             <thead>
@@ -11,8 +11,8 @@
                     <th>Student #</th>
                     <th>First name</th>
                     <th>Last name</th>
-                    <th> Email </th>
-                    <th> Profile </th>
+                    <th> Attended </th>
+                    <th> Note </th>
                 </tr>
             </thead>
 
@@ -24,8 +24,8 @@
                     <td> {{ forloop.counter }}</td>
                     <td> {{ record.student.first_name }} </td>
                     <td> {{ record.student.last_name }}  </td>
-                    <td> {{ record.student.email }} </td>
-                    <td> <a href="{{ record.student.profile}}"> Profile </a> </td> 
+                    <td> {{ record.attended }} </td>
+                    <td> Note </td> 
                 </tr>
 
                 {% endfor %}
