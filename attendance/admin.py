@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Coach, Student, Class, ClassSession, AttendanceRecord, Enrollment, StudentGuardian, StudProfile
+from .models import Coach, Student, Class, ClassSession, AttendanceRecord, Enrollment, StudentGuardian, StudentProfile
 
 # Register your models here.
 
@@ -11,4 +11,4 @@ admin.site.register(Class)
 admin.site.register(Student)
 admin.site.register(Enrollment)
 admin.site.register(StudentGuardian)
-admin.site.register(StudProfile)
+admin.site.register(StudentProfile)

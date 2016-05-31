@@ -24,6 +24,7 @@ class Student(models.Model):
 	student_id = models.AutoField(primary_key=True)
 	first_name = models.CharField(max_length=20)
 	last_name = models.CharField(max_length=20)
+	profile = models.OneToOneField('StudentProfile', on_delete=models.CASCADE)
 
 	def __str__(self):
 		to_string = ''
@@ -33,16 +34,18 @@ class Student(models.Model):
 		return to_string
 
 #A student profile which will contain information about a student
-class StudProfile(models.Model):
+class StudentProfile(models.Model):
 	profile_id = models.AutoField(primary_key=True)
-	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	email = models.EmailField(max_length=60, blank=False)
-	phone = models.IntegerField()
+	phone = models.CharField(max_length=11)
 	github_user_name = models.CharField(max_length=30)
 	bio = models.CharField(max_length=140)
 
 	class Meta:
 		verbose_name_plural = "Student profiles"
+
+	def __str__(self):
+		return str(self.email) + " Profile"
 
 
 #Table for a student's parents/guardian
