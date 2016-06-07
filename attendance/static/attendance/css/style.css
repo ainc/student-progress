@@ -1,3 +1,14 @@
+@import url(https://fonts.googleapis.com/css?family=Exo:400,700,500);
+
+body{
+    font-family: 'Exo', sans-serif;
+    background-color:#2F4858;
+}
+
+p{
+   font-family: 'Exo', sans-serif;
+    background-color:#2F4858;
+}
 .table-data{
 	text-align: center;
 }
@@ -5,4 +16,85 @@
 table.center {
     margin-left:auto; 
     margin-right:auto;
+    table-layout: fixed;
  }
+
+ .nav-bar{
+ 	background-color: #000000;
+ }
+ 
+.content{
+    height:15px;
+    width:100px;
+    overflow:hidden;
+    text-overflow:ellipsis
+}
+
+.profile{
+    text-align: center;
+    margin: 0 auto;
+    color: #F26419;
+}
+
+#outter-signup-form{
+    margin: 0 auto;
+}
+
+#inner-signup-form{
+    width: 45%;
+    margin: 0 auto;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+.content:hover{
+    height:auto;
+    width:auto;
+}
+
+.center-form {
+    display: inline-block;
+    text-align: center;
+}
+
+        .info, .success, .warning, .error, .validation {
+            border: 1px solid;
+            margin: 10px 0px;
+            padding: 15px 10px 15px 50px;
+            background-repeat: no-repeat;
+            background-position: 10px center;
+        }
+        .info {
+            color: #00529B;
+            background-color: #BDE5F8;
+            background-image: url('http://i.imgur.com/ilgqWuX.png');
+        }
+        .success {
+            color: #4F8A10;
+            background-color: #DFF2BF;
+            background-image: url('http://i.imgur.com/Q9BGTuy.png');
+        }
+        .warning {
+            color: #9F6000;
+            background-color: #FEEFB3;
+            background-image: url('http://i.imgur.com/Z8q7ww7.png');
+        }
+        .error{
+            color: #D8000C;
+            background-color: #FFBABA;
+            background-image: url('http://i.imgur.com/GnyDvKN.png');
+            min-width: 100px;
+            max-width: 75%
+        }
+        .validation{
+            color: #D63301;
+            background-color: #FFCCBA;
+            background-image: url('http://i.imgur.com/GnyDvKN.png');
+        }

@@ -11,9 +11,27 @@
 
     <link rel="stylesheet" type="text/css" href="{% static 'attendance/css/style.css' %}" />
 
+    <link rel="stylesheet" type="text/css" href="{% static 'attendance/css/side-menu.css' %}" />
+
 </head>
 
 <body>
+
+	<div class="header">
+	    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed nav-bar">
+	        <a class="pure-menu-heading" href="http://awesomeinc.org">
+	            <img alt="Awesome Inc U" src="{% static 'attendance/images/Logo_Horizontal_white.png' %}"> 
+	        </a>
+
+	        <ul class="pure-menu-list">
+	            <li class="pure-menu-item"><a href="#" class="pure-menu-link">About</a></li>
+	            <li class="pure-menu-item"><a href="#" class="pure-menu-link">Sign Up</a></li>
+	        </ul>
+	    </div>
+	    <br>
+	    <br>
+	    <br>
+	</div>
     
    {% block content%}
 

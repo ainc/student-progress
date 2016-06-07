@@ -1,0 +1,63 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}   
+
+<div id="outter-signup-form">
+    <div id="inner-signup-form">
+
+    <br> 
+    <br> 
+
+    
+    <form class="pure-form pure-form-stacked" action="" method="post">
+            {% csrf_token %}
+    <fieldset>
+        <legend>Sign up</legend>
+
+        <label for="fname">First name</label>
+        <input name="first_name" id="fname" type="text" placeholder="John" value="{{first_name}}" required>
+
+        <label for="fname">Last name</label>
+        <input name="last_name" id="lname" type="text" placeholder="Doe" value="{{last_name}}" required>
+
+        <label for="email">Email</label>
+        <input name="email" id="email" type="email" placeholder="Email" value="{{email}}" required>
+
+        <br> 
+        <br>
+
+        <label for="username">Username</label>
+        <input name="username" id="username" type="text" placeholder="Username" value="{{username}}" required>
+
+        <label for="password">Password</label>
+        <input name="password" id="password" type="password" placeholder="Password" required>
+
+        <label for="type">Account Type</label>
+        <select name="type" id="type">
+            <option>Student</option>
+            <option>Coach</option>
+            <option>Parent</option>
+        </select>
+
+        <br>
+
+        <button type="submit" class="pure-button pure-button-primary">Sign up</button>
+    </fieldset>
+    </form>    
+
+        {% if duplicate_key %}
+
+                <div class="error">Username taken</div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}
+

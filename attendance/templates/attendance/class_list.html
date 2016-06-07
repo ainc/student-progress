@@ -1,0 +1,35 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}   
+    <div class="table-data">
+
+        <h1> {{coach}} </h1>
+
+            <table class="pure-table center pure-table-horizontal">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Class</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for class in classes %}
+
+                    <tr>
+                        <td> {{ forloop.counter }}</td>
+                        <td> <a href="{% url 'attendance:class_roster' class_id=class.class_id coach_id=coach.coach_id %}"> {{ class.class }} </a> </td>
+                        
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+    </div>
+
+
+{% endblock %}

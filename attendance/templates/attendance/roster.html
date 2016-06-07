@@ -1,7 +1,8 @@
 {% extends 'attendance/base.html' %}
 
 {% block content %}   
-    <div class="table-data">
+
+    <div class="table-data pure-menu pure-menu-horizontal">
 
         <h1> {{class}} with {{coach}}</h1>
 
@@ -34,6 +35,14 @@
 
     </table>
 
+     <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="{% url 'attendance:class_overview' coach_id=coach.coach_id class_id=class.class_id%}" class="pure-menu-link">Take attendance</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">Do something</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">Thing 2</a></li>
+        </ul>
+
+
     </div>
+
 
 {% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}   
+
+
+<div align="center">
+
+    <br> 
+    <br> 
+
+    
+    <form class="pure-form pure-form-aligned" action="" method="post">
+            {% csrf_token %}
+    <fieldset>
+        <div class="pure-control-group">
+            <label for="username">Username</label>
+            <input name="username" id="username" type="text" placeholder="Username" required>
+        </div>
+
+        <div class="pure-control-group">
+            <label for="password">Password</label>
+            <input name="password" id="password" type="password" placeholder="Password" required>
+        </div>
+
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">Submit</button>
+            {% if not_found %}
+
+                <div class="error">User not found</div>
+
+            {% endif %}
+
+            {% if error %}
+
+                <div class="error">User not active. Please try again later</div>
+
+            {% endif %}
+        </div>
+    </fieldset>
+</form>    
+
+</div>
+
+
+
+
+{% endblock %}
+

@@ -15,9 +15,7 @@ class Coach(models.Model):
 		return to_string
 
 	class Meta:
-		verbose_name_plural = "Coaches"
-
-
+		verbose_name_plural = 'Coaches'
 
 #Student table
 class Student(models.Model):
@@ -42,10 +40,10 @@ class StudentProfile(models.Model):
 	bio = models.CharField(max_length=140)
 
 	class Meta:
-		verbose_name_plural = "Student profiles"
+		verbose_name_plural = 'Student profiles'
 
 	def __str__(self):
-		return str(self.email) + " Profile"
+		return str(self.email) + ' Profile'
 
 
 #Table for a student's parents/guardian
@@ -63,7 +61,7 @@ class Class(models.Model):
 		return self.class_name
 
 	class Meta:
-		verbose_name_plural = "Class"
+		verbose_name_plural = 'Class'
 
 #Table to show which classes a student is enrolled in, and who the primary coach is. 
 class Enrollment(models.Model):
@@ -75,6 +73,22 @@ class Enrollment(models.Model):
 	def __str__(self):
 		return '--'.join((str(self.student),str(self._class),str(self.coach)))
 
+
+#Each note for a coach will be stored into the database. All coaches will be able to access this note. 
+class CoachNote(models.Model):
+	note_id = models.AutoField(primary_key=True)
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	note = models.CharField(max_length=1000)
+	coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
+
+
+#Students can create goals 
+class StudentGoal(models.Model):
+	goal_id = models.AutoField(primary_key=True)
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	description = models.CharField(max_length=1000)
+
+
 #ClassSession table stores information about a specific class session i.e. week 1
 class ClassSession(models.Model):
 	session_id= models.AutoField(primary_key=True)
@@ -84,15 +98,8 @@ class ClassSession(models.Model):
 
 	# Formats as Peter Kaminski--iOS--May 23rd, 2016
 	def __str__(self):
-		coach_name = str(self.coach)
-		class_name = str(self._class)
-		to_string = ''
-		to_string += coach_name
-		to_string += '--'
-		to_string += class_name
-		to_string += '--'
-		to_string += self.class_date.strftime("%d/%m/%y")
-		return to_string
+		return self.class_date.strftime('%m/%d/%y')
+		
 
 	def formatted_time(self):
 		format_hour_str = ''
@@ -116,7 +123,7 @@ class ClassSession(models.Model):
 
 		time_str = ':'.join((format_hour_str, format_min_str))
 
-		return self.class_date.strftime("%m/%d/%y") + ' ' + time_str
+		return self.class_date.strftime('%m/%d/%y') + ' ' + time_str
 
 #Attendance records will be created individually for every student at each session
 class AttendanceRecord(models.Model):
@@ -126,7 +133,7 @@ class AttendanceRecord(models.Model):
 	_class = models.ForeignKey(Class, on_delete=models.CASCADE) #FK with a class
 	session = models.ForeignKey(ClassSession, on_delete=models.CASCADE) #FK for a specific class session
 	attended = models.BooleanField() #Did the student attend? 
-	
+	note = models.CharField(max_length=250, default='')
 	#String representation shows if student attended. Format -- Peter Kaminski attended iOS
 	def __str__(self):
 		to_string = ''

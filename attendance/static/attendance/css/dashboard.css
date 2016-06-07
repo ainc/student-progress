@@ -1,0 +1,126 @@
+/*
+	teal: #55DDE0
+	navy: #33658A
+	dark: #2F4858
+	sun: #F6AE2D
+	burnt: #F26419
+
+
+	black: 182825;
+	green: 40F99B;
+	grey: 61707D;
+	blue: 016FB9;
+	sky: BCE7FD;
+*/
+
+@import url(https://fonts.googleapis.com/css?family=Exo:400,700,500);
+
+body{
+    font-family: 'Exo', sans-serif;
+    background-color:#FFFCFF;
+}
+
+p{
+   font-family: 'Exo', sans-serif;
+   color: black;
+}
+
+h1.title {
+	font-family: 'Exo', sans-serif;
+	color: black;
+}
+
+h2.bio {
+	font-family: 'Exo', sans-serif;
+	color:black;
+}
+
+.dashboard-piece {
+    min-height: 300px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    padding-bottom: 40px;
+}
+
+.dashboard-piece-tealbg {
+	background-color: #55DDE0;
+}
+.dashboard-piece-navybg {
+	background-color: #33658A;
+}
+.dashboard-piece-darkbg {
+	background-color: #2F4858;
+}
+.dashboard-piece-burntbg {
+	background-color: #F26419;
+}
+.dashboard-piece-sunbg {
+	background-color: #F6AE2D;
+}
+
+.dashboard-piece-blackbg {
+	background-color: #182825;
+}
+.dashboard-piece-greybg {
+	background-color: #61707D;
+}
+.dashboard-piece-greenbg {
+	background-color: #5CB85C;
+}
+.dashboard-piece-bluebg {
+	background-color: #337AB7;
+}
+.dashboard-piece-skybg {
+	background-color: #BCE7FD;
+}
+
+.dashboard-piece-orangebg {
+	background-color: #F0AD4E;
+}
+
+.dashboard-piece-redbg{
+	background-color: #D9534F;
+}
+
+.dashboard-piece-logo h1 {
+    line-height: 100px;
+}
+.dashboard-piece-logo svg {
+    margin-top: 80px;
+}
+.dashboard-piece h1 {
+    line-height: 300px;
+    font-size: 3.6em;
+    margin: 0;
+}
+.dashboard-content {
+    position: relative;
+    z-index: 999;
+}
+.dashboard-content p {
+    font-weight: lighter;
+}
+.dashboard-content .light {
+    opacity: 0.4;
+    display: block;
+}
+.dashboard-content h2 i {
+    font-size: 4em;
+    opacity: 0.4;
+}
+.dashboard-metric {
+    text-transform: uppercase;
+    font-size: 1.6em;
+    line-height: 1;
+    color: white;
+}
+.dashboard-metric i {
+    margin-right: 0.6em;
+}
+
+
+
