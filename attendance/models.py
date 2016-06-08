@@ -1,12 +1,14 @@
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
+from datetime import datetime
 
 #Coach table
 class Coach(models.Model):
 	coach_id = models.AutoField(primary_key=True)
 	first_name = models.CharField(max_length=20)
 	last_name = models.CharField(max_length=20)
+	user = models.OneToOneField(User, on_delete=models.CASCADE) 
 
 	def __str__(self):
 		to_string = ''
@@ -82,6 +84,10 @@ class CoachNote(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	note = models.CharField(max_length=1000)
 	coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
+	created_at = models.DateTimeField( default=datetime.now)
+
+	class Meta:
+		ordering = ('-created_at',)
 
 
 #Students can create goals 
@@ -89,7 +95,10 @@ class StudentGoal(models.Model):
 	goal_id = models.AutoField(primary_key=True)
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	description = models.CharField(max_length=1000)
+	created_at = models.DateTimeField(default=datetime.now)
 
+	class Meta:
+		ordering = ('-created_at',)
 
 #ClassSession table stores information about a specific class session i.e. week 1
 class ClassSession(models.Model):

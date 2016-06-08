@@ -35,6 +35,10 @@ h2.bio {
 	color:black;
 }
 
+h3 {
+	font-family: 'Exo', sans-serif;
+}
+
 .dashboard-piece {
     min-height: 300px;
     -webkit-box-sizing: border-box;

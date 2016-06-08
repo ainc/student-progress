@@ -1,0 +1,63 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %}   
+
+
+        {% for group in user.groups.all %}
+            {% if group.name == 'coaches' %}
+                <div class="pure-menu pure-menu-horizontal">
+                    <p class="pure-menu-heading">{{student}}</p>
+                    <ul class="pure-menu-list">
+                        <li class="pure-menu-item"><a href="{% url 'attendance:leave_note' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-sticky-note fa-2x" aria-hidden="true"></i>  leave note</a></li>
+                    </ul>
+                </div>
+            {% endif %}
+        {% endfor %} 
+
+
+    {% for note in notes %}
+
+   <div class="pure-g"> 
+
+            <div class="pure-u-1-3"> </div>
+
+            <div class="pure-u-1-3 dashboard-piece dashboard-piece-bluebg">
+                       <div class="dashboard-content">
+                               <h2><i class="fa fa-sticky-note-o fa-4x"></i></h2>
+                               <p class="dashboard-metric">
+
+                                    From: {{note.coach}} 
+                                    <br> <br> 
+                                    {{note.note}}
+                                    <br> <br> 
+                                    <h3> {{note.created_at}} </h3>
+
+                               </p>
+                       </div>
+                   </div>
+            <div class="pure-u-1-3"> </div>
+   </div>
+   <br>
+
+    {% endfor %}
+
+    {% if notes.count == 0%} 
+
+    <div class="pure-g"> 
+
+
+            <div class="pure-u-1 dashboard-piece dashboard-piece-orangebg">
+                        <div class="dashboard-content">
+                                <h2><i class="fa fa-exclamation fa-4x"></i></h2>
+                                <p class="dashboard-metric">
+
+                                    No notes yet
+
+                                </p>
+                        </div>
+            </div>
+    </div>
+
+    {% endif %}
+
+{% endblock %}

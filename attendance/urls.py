@@ -12,7 +12,10 @@ urlpatterns = [
     url(r'^attendance/overview/(?P<coach_id>\d+)/(?P<class_id>\d+)/$', views.class_overview, name='class_overview'),
     url(r'^login/$', views.login, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
-    url(r'^student/(?P<student_id>\d+)$', views.student_profile, name='student_profile'),
+    url(r'^signup/coaches/$', views.coach_signup, name='coach_signup'),
+    url(r'^student/(?P<student_id>\d+)/$', views.student_profile, name='student_profile'),
     url(r'^student/(?P<student_id>\d+)/update/$', views.update_profile, name='update_profile'),
+    url(r'^student/(?P<student_id>\d+)/notes/$', views.student_notes, name='student_notes'),
+    url(r'^student/(?P<student_id>\d+)/notes/leave/$', views.leave_note, name='leave_note'),
 
-]
+ ]

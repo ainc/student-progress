@@ -12,7 +12,7 @@
     <form class="pure-form pure-form-stacked" action="" method="post">
             {% csrf_token %}
     <fieldset>
-        <legend class="legend"><h1> Sign up </h1></legend>
+        <legend class="legend"><h1> Create a Coach Account </h1></legend>
 
         <label for="fname">First name</label>
         <input name="first_name" id="fname" type="text" placeholder="John" value="{{first_name}}" required>
@@ -32,11 +32,8 @@
         <label for="password">Password</label>
         <input name="password" id="password" type="password" placeholder="Password" required>
 
-        <label for="type">Account Type</label>
-        <select name="type" id="type">
-            <option>Student</option>
-            <option>Parent</option>
-        </select>
+        <label for="coach_phrase">Coach key</label>
+        <input name="coach_phrase" id="coach_phrase" type="password" placeholder="Ask Nick" required>
 
         <br>
 
@@ -47,6 +44,12 @@
         {% if duplicate_key %}
 
                 <div class="error">Username taken</div>
+
+        {% endif %}
+
+        {% if wrong_phrase %}
+
+                <div class="error">Wrong secret phrase. Contact Nick Such</div>
 
         {% endif %}
 

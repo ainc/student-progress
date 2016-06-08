@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile
-from django.contrib.auth.decorators import login_required
+from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User 
+from django.contrib.auth.models import User, Group
 from django.contrib.auth import login as login_user
 from django.db import IntegrityError
 # Create your views here.
@@ -264,7 +264,106 @@ def update_profile(request, student_id):
 	else:
 		return HttpResponse('Unauthorized')
 
+#We need a view for student goals too
+def student_goals(request, student_id):
+	if request.method == 'POST':
+		print()
 
 
+	#for GET requests we'll just display a student's tasks to them
 	
+	#Get all their goals from the database 
+	else:
+		goals = StudentGoal.objects.filter(student_id=student_id)
 
+
+#View for viewing student notes
+@login_required
+def student_notes(request, student_id):
+
+	#First authenticate the user to see if they can edit this profile 
+	if request.user.is_authenticated():
+		#Then grab the current user's information 
+		student = get_object_or_404(Student, pk=student_id)
+		#Dissect a post request 
+		if request.method == 'POST':
+			#Get all fields that could be updated 
+			
+			#Return the user to their updated profile page
+			return HttpResponseRedirect(reverse('attendance:student_profile', args=(student.student_id,)))
+
+		#GET requests should show the update page 
+		else:
+			notes = CoachNote.objects.filter(student=student)
+			return render(request, 'attendance/notes.html', {'student': student, 'notes': notes})
+	#No precious, they musnt access this page 
+	else:
+		return HttpResponse('Unauthorized')
+
+
+#Have a view for coaches to signup
+def coach_signup(request):
+	#If it's a post then we'll authenticate and store the data entered
+	if request.method == 'POST':
+
+		username = request.POST['username']
+		email = request.POST['email']
+		password = request.POST['password']
+		first_name = request.POST['first_name']
+		last_name = request.POST['last_name']
+			
+		if request.POST['coach_phrase'] == 'rule #22':
+			print('pass correct')
+			try:
+
+				#Create a user object for these fields
+				user = User.objects.create_user(username, email, password)
+				user.first_name = first_name
+				user.last_name = last_name
+				#Add the coach to the coaches group
+				group = Group.objects.get(name='coaches')
+				user.groups.add(group)
+				#Associate this coach with this user
+				coach = Coach.objects.create(first_name=first_name, last_name=last_name, user=user)
+				user.save()
+				user = authenticate(username=username, password=password)
+				login_user(request, user)
+
+				return HttpResponseRedirect(reverse('attendance:classes_for_coach', args=(coach.coach_id,)))
+			except IntegrityError as e:
+				print(e)
+				#Take them back to the page to correct errors
+				return render(request, 'attendance/coach_portal.html', {'duplicate_key': True, 'first_name': first_name, 'last_name':last_name, 'email': email, 
+					'username': '' })
+		#Wrong pass phrases return
+		else:
+			#Take them back to the page to correct errors
+			return render(request, 'attendance/coach_portal.html', {'duplicate_key': False, 'first_name': first_name, 'last_name':last_name, 'email': email, 
+				'username': username, 'wrong_phrase': True })
+
+	#Get requests will return the signup html page
+	else:
+		return render(request, 'attendance/coach_portal.html', {'duplicate_key': False, 'first_name': 
+			'', 'last_name':'', 'email': '', 
+				'username': '' })
+
+#Decorator method to help us check if the user is a coach
+def group_check(user):
+    return user.groups.filter(name__in=['coaches'])
+
+#For the leave note view we make the user has coach permissions
+@user_passes_test(group_check)
+def leave_note(request, student_id):
+	if request.user.is_authenticated():
+
+		student = get_object_or_404(Student, pk=student_id)
+		#Then we create a new coach note object 
+		if request.method == 'POST':
+			note = request.POST['note']
+			CoachNote.objects.create(coach=request.user.coach, note=note, student=student)
+			return HttpResponseRedirect(reverse('attendance:student_notes', args=(student_id)))
+		else:
+			return render(request, 'attendance/leave_note.html', {'student': student})
+
+	else: 
+		return HttpResponse('Unauthorized')

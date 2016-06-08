@@ -1,0 +1,44 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %} 
+
+<div align="center">
+
+    <h1> Leave note for {{student}} </h1>
+
+</div>
+
+<div class="pure-g" align="center">
+
+    <div class="pure-u-1-3">
+
+    </div>
+
+    <div class="pure-u-1-3">
+
+    
+
+
+
+        <form class="pure-form" action="" method="post">
+                {% csrf_token %}
+                <fieldset class="pure-group">
+                        <textarea class="pure-input-1-2" placeholder="Leave a note" id="note" name="note"></textarea>
+                </fieldset>
+
+                <button type="submit" class="pure-button pure-input-1-2 pure-button-primary">Leave note</button>
+
+        
+        </form>    
+            
+    </div>
+
+    <div class="pure-u-1-3">
+
+    </div>
+</div>
+
+
+
+{% endblock %}
+
