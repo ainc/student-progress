@@ -13,5 +13,6 @@ urlpatterns = [
     url(r'^login/$', views.login, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^student/(?P<student_id>\d+)$', views.student_profile, name='student_profile'),
+    url(r'^student/(?P<student_id>\d+)/update/$', views.update_profile, name='update_profile'),
 
 ]

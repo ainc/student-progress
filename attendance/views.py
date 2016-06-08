@@ -1,10 +1,11 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User 
+from django.contrib.auth import login as login_user
 from django.db import IntegrityError
 # Create your views here.
 
@@ -144,6 +145,11 @@ def signup(request):
 
 			#Create a user object for these fields
 			user = User.objects.create_user(username, email, password)
+			user.first_name = first_name
+			user.last_name = last_name
+			user.save()
+			user = authenticate(username=username, password=password)
+			login_user(request, user)
 		except IntegrityError as e:
 			return render(request, 'attendance/signup.html', {'duplicate_key': True, 'first_name': first_name, 'last_name':last_name, 'email': email, 
 				'username': '' })
@@ -153,11 +159,11 @@ def signup(request):
 
 		#For students we will need to create a profile 
 		if type_of_user == 'Student':
-			profile = StudentProfile.objects.create(email=email)
+			profile = StudentProfile.objects.create(email=email, user=user)
 			student = Student.objects.create(first_name=first_name, last_name=last_name, profile=profile)
-			user.student = student
-			user.save()
-			return HttpResponseRedirect(reverse('attendance:student_profile', args=(student.student_id,)))
+			
+			return redirect('attendance:student_profile', student_id=student.student_id)
+			#return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'can_edit': True, 'should_update': True})
 		#For parents we have to make sure they approved to view their student's information
 		elif type_of_user == 'Parent':
 			return render(request, 'attendance/guardian_reg.html', {'first_name': first_name, 'last_name': last_name, 'email': email})
@@ -180,9 +186,14 @@ def login(request):
 		#If the user was authenticated, then we'll log them in
 		if user is not None:
 			if user.is_active:
-				login(request, user)
-				#Take them to their profile
+				login_user(request, user)
+				#Take them to their profile if they have one (aka a student, not a parent)
+				if user.studentprofile:
+					student = Student.objects.get(profile=user.studentprofile)
 
+					return redirect('attendance:student_profile', student_id=student.student_id)
+				else:
+					return redirect('attendance:home_page.html')
 			else:
 				print('not active')
 				return render(request, 'attendance/login.html', {'error': True})
@@ -193,56 +204,67 @@ def login(request):
 	else:
 		return render(request, 'attendance/login.html')
 
+@login_required
 #View to show a student profile. This will have two views--depending on if the user is authenticated or not
-
 def student_profile(request, student_id):
 	#Users have to be logged in to see this page
 	if request.user.is_authenticated():
 		student = get_object_or_404(Student, pk=student_id)
 		profile = student.profile
-		can_edit = False
-		#If the user is the student, then they can edit the profile
-		if request.user.first_name == student.first_name:
-			can_edit = True
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'can_edit': can_edit})
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile})
 
 	else:
 		return render(request, 'attendance/login.html')
 	
-
 #View for editing a student profile 
+@login_required
 def update_profile(request, student_id):
 
 	#First authenticate the user to see if they can edit this profile 
+	if request.user.is_authenticated():
+		#Then grab the current user's information 
+		student = get_object_or_404(Student, pk=student_id)
+		profile = student.profile
+		#If the current user's profile matches the one they are trying to edit, then they are authorized 
+		if request.user.studentprofile == profile:
+			print('Okay for update')
+			#Dissect a post request 
+			if request.method == 'POST':
+				#Get all fields that could be updated 
+				email = request.POST['email']
+				bio = request.POST['bio']
+				phone = request.POST['phone']
+				github_username = request.POST['github_username']
+				first_name = request.POST['first_name']
+				last_name = request.POST['last_name']
 
+				#Update the fields
+				profile.bio = bio
+				profile.email = email
+				profile.github_user_name = github_username
+				profile.phone = phone
+				student.first_name = first_name
+				student.last_name = last_name
 
-	#Then grab the current user's information 
-	student = get_object_or_404(Student, pk=student_id)
-	profile = student.profile
+				#Save the objects again
+				profile.save()
+				student.save()
 
-	if request.method == 'POST':
-		#Get all fields that could be updated 
-		email = request.POST['email']
-		bio = request.POST['bio']
-		phone = request.POST['phone']
-		github_username = request.POST['github_username']
-		first_name = request.POST['first_name']
-		last_name = request.POST['last_name']
+				#Return the user to their updated profile page
+				return HttpResponseRedirect(reverse('attendance:student_profile', args=(student.student_id,)))
 
-		#Update the fields
-		profile.bio = bio
-		profile.email = email
-		profile.github_username = github_username
-		profile.phone = phone
-		student.first_name = first_name
-		student.last_name = last_name
+			#GET requests should show the update page 
+			else:
+				return render(request, 'attendance/update_profile.html', {'student': student, 'profile': profile})
 
-		#Save the objects again
-		profile.save()
-		student.save()
+		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
+		else:
+			return HttpResponse('Unauthorized')
+	#No precious, they musnt access this page 
 	else:
-		return render(request, 'attendance/update_profile', {'student': student, 'profile': profile})
+		return HttpResponse('Unauthorized')
 
 
 
+	
 

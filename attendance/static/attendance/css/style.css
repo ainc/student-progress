@@ -2,12 +2,29 @@
 
 body{
     font-family: 'Exo', sans-serif;
-    background-color:#2F4858;
+    background-color:#182825;
+    color:black;
+}
+
+label {
+    font-family: 'Exo', sans-serif;
+    background-color:#182825;
+    color:white;
+}
+
+h1, h2, h3{
+    font-family: 'Exo', sans-serif;
+    color: white;
+}
+
+.pure-button-primary{
+    background-color: #EE2524;
 }
 
 p{
    font-family: 'Exo', sans-serif;
-    background-color:#2F4858;
+    background-color:#182825;
+    color: white;
 }
 .table-data{
 	text-align: center;

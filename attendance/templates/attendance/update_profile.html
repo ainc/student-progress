@@ -1,0 +1,80 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %} 
+
+<div align="center">
+
+    <h1> Update profile </h1>
+
+</div>
+
+<div class="pure-g">
+
+    <div class="pure-u-1-3">
+
+    </div>
+
+    <div class="pure-u-1-3">
+
+            <form class="pure-form pure-form-aligned" action="" method="post">
+                    {% csrf_token %}
+            <fieldset>
+                <div class="pure-control-group">
+                    <label for="first_name">First name</label>
+                    <input name="first_name" id="first_name" type="text" value="{{student.first_name}}" placeholder='name' required>
+                </div>
+                <br>
+                <div class="pure-control-group">
+                    <label for="last_name">Last name</label>
+                    <input name="last_name" id="last_name" type="text" value="{{student.last_name}}" placeholder="surname" required>
+                </div>
+                <br>
+                <div class="pure-control-group">
+                    <label for="email">Email</label>
+                    <input name="email" id="email" type="email" value="{{profile.email}}" placeholder="email" required>
+                </div>
+                <br>
+                <div class="pure-control-group">
+                    <label for="phone">Phone</label>
+                    <input name="phone" id="phone" type="text" value="{{profile.phone}}" placeholder="phone number" required>
+                </div>
+                <br>
+                <div class="pure-control-group">
+                    <label for="github">Github username</label>
+                    <input name="github_username" id="github_username" type="text" value="{{profile.github_user_name}}" placeholder="github username">
+                </div>
+                <br>
+                <div class="pure-control-group">
+                    <label for="bio">Bio</label>
+                    <input name="bio" id="bio" type="text" value="{{profile.bio}}" placeholder="bio">
+                </div>
+                <br>
+
+                <div class="pure-controls">
+                    <button type="submit" class="pure-button pure-button-primary">Submit</button>
+                    {% if not_found %}
+
+                        <div class="error">User not found</div>
+
+                    {% endif %}
+
+                    {% if error %}
+
+                        <div class="error">User not active. Please try again later</div>
+
+                    {% endif %}
+                </div>
+            </fieldset>
+        </form>    
+        
+    </div>
+
+    <div class="pure-u-1-3">
+
+    </div>
+</div>
+
+
+
+{% endblock %}
+

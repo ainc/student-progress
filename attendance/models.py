@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models
+from django.contrib.auth.models import User
 
 #Coach table
 class Coach(models.Model):
@@ -38,6 +39,7 @@ class StudentProfile(models.Model):
 	phone = models.CharField(max_length=11)
 	github_user_name = models.CharField(max_length=30)
 	bio = models.CharField(max_length=140)
+	user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 	class Meta:
 		verbose_name_plural = 'Student profiles'

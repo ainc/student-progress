@@ -5,23 +5,21 @@
 
 <div align="center">
 
-    <br> 
-    <br> 
+    <h1> Login </h1>
 
-    
-    <form class="pure-form pure-form-aligned" action="" method="post">
+    <form class="pure-form pure-form-stacked" action="" method="post">
             {% csrf_token %}
     <fieldset>
         <div class="pure-control-group">
-            <label for="username">Username</label>
+            <label for="username"></label>
             <input name="username" id="username" type="text" placeholder="Username" required>
         </div>
-
+        <br>
         <div class="pure-control-group">
-            <label for="password">Password</label>
+            <label for="password"></label>
             <input name="password" id="password" type="password" placeholder="Password" required>
         </div>
-
+        <br>
         <div class="pure-controls">
             <button type="submit" class="pure-button pure-button-primary">Submit</button>
             {% if not_found %}
