@@ -81,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'awesome_student_progress',
         'USER': 'root',
-        'PASSWORD': 'hackSQL2019',
+        'PASSWORD': 'awesomeSQL2019',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }
