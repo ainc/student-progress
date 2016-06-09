@@ -17,6 +17,26 @@ h1, h2, h3{
     color: white;
 }
 
+.white{
+    color: white;
+    font-size: large;
+}
+
+.white:hover{
+    background-color: white;
+    color: black;
+    font-size: large;
+
+}
+
+li {
+    font-size: normal;
+}
+
+tbody{
+    font-size: large;
+}
+
 .pure-button-primary{
     background-color: #EE2524;
 }
@@ -30,10 +50,28 @@ p{
 	text-align: center;
 }
 
+a:link{
+    color: #EE2524;
+}
+
+a:hover{
+    background-color: white;
+    color: #777777;
+}
+
+a:visited{
+    color: #777777;
+}
+
+a{
+    color: white;
+}
+
 table.center {
     margin-left:auto; 
     margin-right:auto;
     table-layout: fixed;
+    background-color: white;
  }
 
  .nav-bar{
@@ -41,7 +79,7 @@ table.center {
  }
  
 .content{
-    height:15px;
+    height:25px;
     width:100px;
     overflow:hidden;
     text-overflow:ellipsis

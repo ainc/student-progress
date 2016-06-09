@@ -8,6 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import login as login_user
 from django.db import IntegrityError
 # Create your views here.
+from datetime import datetime
 
 def home_page(request):
 	return render(request, 'attendance/home_page.html', {})
@@ -188,10 +189,12 @@ def login(request):
 			if user.is_active:
 				login_user(request, user)
 				#Take them to their profile if they have one (aka a student, not a parent)
-				if user.studentprofile:
+				if hasattr(user, 'studentprofile'):
 					student = Student.objects.get(profile=user.studentprofile)
 
 					return redirect('attendance:student_profile', student_id=student.student_id)
+				elif hasattr(user, 'coach'):
+					return redirect('attendance:classes_for_coach', coach_id=user.coach.coach_id)
 				else:
 					return redirect('attendance:home_page.html')
 			else:
@@ -227,7 +230,6 @@ def update_profile(request, student_id):
 		profile = student.profile
 		#If the current user's profile matches the one they are trying to edit, then they are authorized 
 		if request.user.studentprofile == profile:
-			print('Okay for update')
 			#Dissect a post request 
 			if request.method == 'POST':
 				#Get all fields that could be updated 
@@ -320,6 +322,7 @@ def coach_signup(request):
 				user = User.objects.create_user(username, email, password)
 				user.first_name = first_name
 				user.last_name = last_name
+				user.is_staff = True
 				#Add the coach to the coaches group
 				group = Group.objects.get(name='coaches')
 				user.groups.add(group)
@@ -367,3 +370,48 @@ def leave_note(request, student_id):
 
 	else: 
 		return HttpResponse('Unauthorized')
+
+#For the enrollment view we will grab the coach and the class, then show a list of all students that can be enrolled
+@user_passes_test(group_check)
+def enroll(request, coach_id, class_id):
+	coach = get_object_or_404(Coach, pk=coach_id)
+	clas = get_object_or_404(Class, pk=class_id)
+
+	if request.method == 'POST':
+		students = request.POST.getlist('student')
+		#For each student id in the post request, we're going to create an enrollment record for them 
+		for id_num in students:
+			student = get_object_or_404(Student, pk=id_num)
+			Enrollment.objects.create(student=student, coach=coach, _class=clas)
+		return HttpResponseRedirect(reverse('attendance:class_roster', args=(coach.coach_id, clas.class_id,)))
+	else:
+
+		#This my friends, is probably the sexiest code I've written this summer 
+
+		#Using set subtraction we'll grab only unenrolled students. Thank you Aaron Cote
+		all_students = Student.objects.all().values_list('student_id', flat=True)
+		enrolled_students = Enrollment.objects.filter(coach=coach, _class=clas).values_list('student__student_id', flat=True)
+		unenrolled_student_ids = list(set(all_students)-set(enrolled_students))
+		#Get the list of unenrolled student objects
+		unenrolled_student_objects = [Student.objects.get(pk=id) for id in unenrolled_student_ids]
+		return render(request, 'attendance/enroll.html', {'coach':coach, 'students':unenrolled_student_objects, 'class':clas})
+
+@user_passes_test(group_check)
+def create_session(request, coach_id, class_id):
+	coach = get_object_or_404(Coach, pk=coach_id)
+	clas = get_object_or_404(Class, pk=class_id)
+
+	if request.method == 'POST':
+		date = request.POST['date']
+		time = request.POST['time']
+
+		formatted_date = datetime.strptime(str(date) + ' ' + str(time), '%m/%d/%Y %I:%M%p')
+
+		#Create a new class session from this 
+		new_session = ClassSession.objects.create(coach=coach, _class=clas, class_date=formatted_date)
+		#Now take them to the actual attendance for this date
+		return HttpResponseRedirect(reverse('attendance:class_session', args=(coach_id, class_id, new_session.session_id)))
+	else:
+		all_students = Student.objects.all().order_by('last_name')
+		return render(request, 'attendance/create_session.html', {'coach':coach, 'students':all_students, 'class':clas})
+

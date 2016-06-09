@@ -4,7 +4,7 @@
 
     <div class="table-data pure-menu pure-menu-horizontal">
 
-        <h1> {{class}} with {{coach}}</h1>
+        <h1> {{class}} with <a href="{% url 'attendance:classes_for_coach' coach_id=coach.coach_id%}">{{coach}}</a></h1>
 
         <table class="pure-table center pure-table-horizontal">
             <thead>
@@ -31,6 +31,11 @@
                 </tr>
                 {% endfor %}
 
+                <tr>
+                    <td> <a href="{% url 'attendance:create_session' coach_id=coach.coach_id class_id=class.class_id%}"> + </a> </td>
+                    <td></td>
+                    <td></td>
+                </tr>
             </tbody>
 
     </table>

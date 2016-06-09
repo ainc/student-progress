@@ -1,0 +1,44 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}  
+    
+     {% load staticfiles %}
+
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+    <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <link href="{% static 'attendance/css/jquery.timepicker.css'%}" rel="stylesheet">
+    <script src="{% static 'js/jquery.timepicker.min.js'%}"></script>
+
+
+    <script>
+      $(function() {
+         $( "#datepicker-13" ).datepicker();
+         $("#timepicker-13").timepicker();
+
+      });
+    </script>
+
+<div align="center">
+
+  <form class="pure-form pure-form-stacked" action="" method="post">
+          {% csrf_token %}
+  <fieldset>
+      <h1> New Session </h1>
+
+      <label for="date">Date</label>
+      <input name="date" id="datepicker-13" type="text" placeholder="05/13/16" required>
+
+      <label for="time">Time</label>
+      <input name="time" id="timepicker-13" type="time" placeholder="6:00 pm" required>
+
+      <br>
+
+      <button type="submit" class="pure-button pure-button-primary">Sign up</button>
+  </fieldset>
+  </form>   
+
+
+</div>
+  
+{% endblock %}
