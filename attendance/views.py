@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote
+from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
@@ -214,7 +214,23 @@ def student_profile(request, student_id):
 	if request.user.is_authenticated():
 		student = get_object_or_404(Student, pk=student_id)
 		profile = student.profile
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile})
+		enrollments = Enrollment.objects.filter(student=student).values_list('_class', 'coach_id')
+		upcoming_sessions = []
+		for clas in enrollments:
+			dic = {}
+			dic['class'] = get_object_or_404(Class, pk=clas[0])
+			dic['coach'] = get_object_or_404(Coach, pk=clas[1])
+			dic['sessions'] = ClassSession.objects.filter(coach=clas[1], _class=clas[0], class_date__gte=datetime.now()).order_by('class_date')
+			upcoming_sessions.append(dic)
+		
+		goals_met = StudentGoal.objects.filter(student=student, met=True)
+		goals_set = StudentGoal.objects.filter(student=student)
+
+		notes = CoachNote.objects.filter(student=student)
+
+		skills = Subskill.objects.all()
+		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met)})
 
 	else:
 		return render(request, 'attendance/login.html')
@@ -265,19 +281,6 @@ def update_profile(request, student_id):
 	#No precious, they musnt access this page 
 	else:
 		return HttpResponse('Unauthorized')
-
-#We need a view for student goals too
-def student_goals(request, student_id):
-	if request.method == 'POST':
-		print()
-
-
-	#for GET requests we'll just display a student's tasks to them
-	
-	#Get all their goals from the database 
-	else:
-		goals = StudentGoal.objects.filter(student_id=student_id)
-
 
 #View for viewing student notes
 @login_required
@@ -371,6 +374,71 @@ def leave_note(request, student_id):
 	else: 
 		return HttpResponse('Unauthorized')
 
+
+
+#View for editing a student profile 
+@login_required
+def set_goal(request, student_id):
+
+	#First authenticate the user to see if they can edit this profile 
+	if request.user.is_authenticated():
+		#Then grab the current user's information 
+		student = get_object_or_404(Student, pk=student_id)
+		profile = student.profile
+		#If the current user's profile matches the one they are trying to edit, then they are authorized 
+		if request.user.studentprofile == profile:
+			#Dissect a post request 
+			if request.method == 'POST':
+				#Get all fields that could be updated 
+				goal = request.POST['goal']
+				StudentGoal.objects.create(description=goal, student=student)
+
+				#Return the user to their updated profile page
+				return HttpResponseRedirect(reverse('attendance:student_goals', args=(student.student_id,)))
+
+			#GET requests should show the update page 
+			else:
+				return render(request, 'attendance/set_goal.html', {'student': student})
+
+		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
+		else:
+			return HttpResponse('Unauthorized')
+	#No precious, they musnt access this page 
+	else:
+		return HttpResponse('Unauthorized')
+
+#View for editing a student profile 
+@login_required
+def mark_goal(request, student_id, goal_id):
+
+	#First authenticate the user to see if they can edit this profile 
+	if request.user.is_authenticated():
+		#Then grab the current user's information 
+		student = get_object_or_404(Student, pk=student_id)
+		profile = student.profile
+		#If the current user's profile matches the one they are trying to edit, then they are authorized 
+		if request.user.studentprofile == profile:
+			#Dissect a post request 
+			if request.method == 'POST':
+				goal = get_object_or_404(StudentGoal, pk=goal_id)
+				goal.met = True
+				goal.save()
+
+				#Return the user to their updated profile page
+				return HttpResponseRedirect(reverse('attendance:student_goals', args=(student.student_id,)))
+
+			#GET requests should show the update page 
+			else:
+				return render(request, 'attendance/set_goal.html', {'student': student})
+
+		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
+		else:
+			return HttpResponse('Unauthorized')
+	#No precious, they musnt access this page 
+	else:
+		return HttpResponse('Unauthorized')
+
+
 #For the enrollment view we will grab the coach and the class, then show a list of all students that can be enrolled
 @user_passes_test(group_check)
 def enroll(request, coach_id, class_id):
@@ -415,3 +483,87 @@ def create_session(request, coach_id, class_id):
 		all_students = Student.objects.all().order_by('last_name')
 		return render(request, 'attendance/create_session.html', {'coach':coach, 'students':all_students, 'class':clas})
 
+
+@login_required
+def student_goals(request, student_id):
+
+	student = get_object_or_404(Student, pk=student_id)
+	goals = StudentGoal.objects.filter(student=student)
+
+	return render(request, 'attendance/goals.html', {'student':student, 'goals': goals})
+
+
+@login_required
+def skill_list(request, student_id):
+	student = get_object_or_404(Student, pk=student_id)
+	skills = Skill.objects.all()
+
+	return render(request, 'attendance/skills.html', {'student':student, 'skills': skills})
+
+
+@login_required
+def skill_overview(request, student_id, skill_id):
+	student = get_object_or_404(Student, pk=student_id)
+	skill = get_object_or_404(Skill, pk=skill_id)
+
+	#Grab all the subskills and all the ones the student has met
+	subskills = Subskill.objects.filter(skill=skill)
+	student_met = StudentProgress.objects.filter(student=student, achieved=True)
+
+	subskill_list = []
+	#Go through all the subskills 
+	for subskill in subskills:
+		#Create a dict that holds the subskill and if it was achieved
+		subskill_dict = {}
+		if subskill in student_met:
+			subskill_dict['achieved'] = True
+		else:
+			subskill_dict['achieved'] = False
+
+		subskill_dict['subskill'] = subskill
+
+		#Append that dict to the list of subskills
+		subskill_list.append(subskill_dict)
+
+	print(subskill_list)
+	return render(request, 'attendance/skill_overview.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
+
+@login_required
+def student_skills(request, student_id):
+
+	student = get_object_or_404(Student, pk=student_id)
+	skills = Skill.objects.all()
+
+	skill_list = []
+
+	#Go through each skill 
+	for skill in skills:
+		#Create a dict to hold these values 
+		skill_dict = {}
+		skill_dict['skill'] = skill
+		
+		#Grab all the subskills and all the ones the student has met
+		subskills = Subskill.objects.filter(skill=skill)
+		student_met = StudentProgress.objects.filter(student=student, achieved=True)
+		
+		subskill_list = []
+		#Go through all the subskills 
+		for subskill in subskills:
+			#Create a dict that holds the subskill and if it was achieved
+			subskill_dict = {}
+			if subskill in student_met:
+				subskill_dict['achieved'] = True
+			else:
+				subskill_dict['achieved'] = False
+
+			subskill_dict['subskill'] = subskill
+
+			#Append that dict to the list of subskills
+			subskill_list.append(subskill_dict)
+
+		#Add that subskill list to the skill dict as subskills 
+		skill_dict['subskills'] = subskill_list
+		#Add them to the final list 
+		skill_list.append(skill_dict)
+
+	return render(request, 'attendance/skills.html', {'student': student, 'skills': skill_list})

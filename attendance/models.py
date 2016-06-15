@@ -96,9 +96,40 @@ class StudentGoal(models.Model):
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
 	description = models.CharField(max_length=1000)
 	created_at = models.DateTimeField(default=datetime.now)
+	met = models.BooleanField(default=False)
 
 	class Meta:
-		ordering = ('-created_at',)
+		ordering = ('met','created_at',)
+
+
+#A skill will only have a title 
+class Skill(models.Model):
+	skill_id = models.AutoField(primary_key=True)
+	title = models.CharField(max_length=30)
+
+	def __str__(self):
+		return self.title
+
+	def subtree(self):
+		#Return all the skills that constitute this subtree
+		return Subskill.objects.filter(skill=self).order_by('sub_id')
+
+#A subskill will have a field to note which skill it derives from
+class Subskill(models.Model):
+	sub_id = models.AutoField(primary_key=True)
+	description = models.CharField(max_length=1000)
+	skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return str(self.skill) + ' -- ' + self.description
+
+#Student progress will keep track of a subskill, a student, and if they have created a
+class StudentProgress(models.Model):
+	progress_id = models.AutoField(primary_key=True)
+	achieved = models.BooleanField(default=False)
+	subskill = models.ForeignKey(Subskill, on_delete=models.CASCADE)
+	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+
 
 #ClassSession table stores information about a specific class session i.e. week 1
 class ClassSession(models.Model):

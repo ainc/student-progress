@@ -35,9 +35,43 @@ h2.bio {
 	color:black;
 }
 
+h2.subskill {
+    font-family: 'Exo', sans-serif;
+    color:black;
+}
+
 h3 {
 	font-family: 'Exo', sans-serif;
 }
+
+strong {
+    font-family: 'Exo', sans-serif;
+}
+
+small {
+    font-family: 'Exo', sans-serif;
+}
+
+tr {
+    color:black;
+    font-family: 'Exo', sans-serif;
+    background-color: #f9f9f9;
+}
+
+th {
+    font-family: 'Exo', sans-serif;
+    text-align: center;
+    background-color: #E0E0E0;
+}
+
+.pure-button-primary {
+    background-color: #5CB85C;
+}
+
+a:link.dashboard-link  {color:#FFFFFF; background-color:transparent; text-decoration:none}
+a:visited.dashboard-link {color:#FFFFFF; background-color:transparent; text-decoration:none}
+a:hover.dashboard-link   {color:#F6AE2D; background-color:transparent; text-decoration:underline}
+a:active.dashboard-link {color:#F6AE2D; background-color:transparent; text-decoration:underline}
 
 .dashboard-piece {
     min-height: 300px;

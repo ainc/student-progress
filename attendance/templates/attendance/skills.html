@@ -1,0 +1,79 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %} 
+
+<section class="dashboard">
+
+    {% for group in user.groups.all %}
+        {% if group.name == 'coaches' %}
+            <div class="pure-menu pure-menu-horizontal">
+                <p class="pure-menu-heading">{{student}}</p>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="{% url 'attendance:leave_note' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-check fa-2x" aria-hidden="true"></i>  mark goals </a></li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endfor %} 
+
+
+    <div class="pure-g">
+        <div class="pure-u-1 dashboard-piece dashboard-piece-logo">
+        <h1 class="title">
+            Skills
+        </h1>
+        </div>
+    </div>
+
+
+    <div class="pure-g">
+
+        <div class="pure-u-2-24"> </div> 
+
+        {% for skill in skills %}
+
+            <div class="pure-u-6-24 dashboard-piece dashboard-piece-tealbg">
+                <div class="dashboard-content">
+                    <h2><i class="fa fa-tasks fa-4x"></i></h2>
+                    <p class="dashboard-metric"> <a class="dashboard-link" href="{% url 'attendance:skill_overview' student_id=student.student_id skill_id=skill.skill.skill_id %}"> {{skill.skill.title}} </a> </p>
+                </div>
+            </div>
+
+            {% if forloop.counter|divisibleby:3 %}
+
+                <div class="pure-u-2-24"> </div>
+
+                </div>
+
+                <br> <br>
+
+                <div class="pure-g">
+
+                    <div class="pure-u-2-24"> </div> 
+
+            {% else %}
+
+                <div class="pure-u-1-24"> </div>
+            {% endif %}
+
+        {% endfor %}
+    
+    
+</section>
+
+<footer>
+</footer>
+
+<div class="profile">
+
+    <style>
+        a:link.pure-menu-link  {color:#F6AE2D; background-color:transparent; text-decoration:none}
+        a:visited.pure-menu-link {color:#F6AE2D; background-color:transparent; text-decoration:none}
+        a:hover.pure-menu-link   {color:#F26419; background-color:transparent; text-decoration:underline}
+        a:active.pure-menu-link  {color:#F6AE2D; background-color:transparent; text-decoration:underline}
+    </style>
+    
+</div>
+
+
+
+{% endblock %}
