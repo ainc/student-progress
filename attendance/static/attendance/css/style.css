@@ -64,8 +64,15 @@ a:visited{
 }
 
 a{
+    font-family: 'Exo', sans-serif;
     color: white;
 }
+
+
+a:link.footer-link  {color:#F6AE2D; background-color:transparent; text-decoration:none}
+a:visited.footer-link {color:#F6AE2D; background-color:transparent; text-decoration:none}
+a:hover.footer-link   {color:#F26419; background-color:transparent; text-decoration:underline}
+a:active.footer-link {color:#F6AE2D; background-color:transparent; text-decoration:underline}
 
 table.center {
     margin-left:auto; 

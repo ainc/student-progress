@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress
+from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
@@ -10,12 +10,26 @@ from django.db import IntegrityError
 # Create your views here.
 from datetime import datetime
 
+'''
+	Decorators 
+'''
+
+#Decorator method to help us check if the user is a coach
+def group_check(user):
+    return user.groups.filter(name__in=['coaches'])
+
+
+
 def home_page(request):
 	return render(request, 'attendance/home_page.html', {})
 
+''' 
+Coaches methods 
+
+'''
 
 #View to render the roster for a coach and a class
-@login_required
+@user_passes_test(group_check)
 def class_roster(request, coach_id, class_id):
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -24,7 +38,7 @@ def class_roster(request, coach_id, class_id):
 	return render(request, 'attendance/roster.html', {'roster': query_set, 'coach': coach, 'class': clas})
 
 #View to render the roster and the edit attendance for a coach, a class, and a class session
-@login_required
+@user_passes_test(group_check)
 def class_session(request, coach_id, class_id, session_id):
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -68,7 +82,7 @@ def class_session(request, coach_id, class_id, session_id):
 		return render(request, 'attendance/session.html', {'roster': query_set, 'coach': coach, 'class': clas, 'session': session, 'isUpdate': isUpdate, 'old_records': student_records})
 
 
-@login_required
+@user_passes_test(group_check)
 def classes_for_coach(request, coach_id):
 	coach = get_object_or_404(Coach, pk=coach_id)
 	#This query will return a dictionary of all the unique classes this coach teaches
@@ -85,7 +99,7 @@ def classes_for_coach(request, coach_id):
 
 
 #View to show an attendance overview for each student--showing how often they have come to the class
-@login_required
+@user_passes_test(group_check)
 def class_overview(request, class_id, coach_id):
 	#Get the coach, class, and students
 	coach = get_object_or_404(Coach, pk=coach_id)
@@ -131,6 +145,9 @@ def class_overview(request, class_id, coach_id):
 	return render(request, 'attendance/overview.html', {'coach': coach, 'class': clas,  'sessions':sessions, 'records': student_attendance_records, 'students': students_in_class})
 
 
+
+''' user auth '''
+
 #For a signup request
 def signup(request):
 
@@ -167,7 +184,9 @@ def signup(request):
 			#return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'can_edit': True, 'should_update': True})
 		#For parents we have to make sure they approved to view their student's information
 		elif type_of_user == 'Parent':
-			return render(request, 'attendance/guardian_reg.html', {'first_name': first_name, 'last_name': last_name, 'email': email})
+			#Create a new guardian object here
+			guardian = StudentGuardian.objects.create(name=first_name + ' ' + last_name, user=user)
+			return redirect('attendance:add_relation', guardian_id=guardian.guardian_id)
 
 	#Get requests will return the signup html page
 	else:
@@ -195,24 +214,49 @@ def login(request):
 					return redirect('attendance:student_profile', student_id=student.student_id)
 				elif hasattr(user, 'coach'):
 					return redirect('attendance:classes_for_coach', coach_id=user.coach.coach_id)
+				elif hasattr(user, 'studentguardian'):
+					return redirect('attendance:parent_home', guardian_id=user.studentguardian.guardian_id)
 				else:
-					return redirect('attendance:home_page.html')
+					return redirect('attendance:home_page')
 			else:
 				print('not active')
 				return render(request, 'attendance/login.html', {'error': True})
 		else:
-			print('none')
+			print('recorded none')
 			return render(request, 'attendance/login.html', {'not_found': True})
 
 	else:
 		return render(request, 'attendance/login.html')
+
+
+''' student profiles ''' 
 
 @login_required
 #View to show a student profile. This will have two views--depending on if the user is authenticated or not
 def student_profile(request, student_id):
 	#Users have to be logged in to see this page
 	if request.user.is_authenticated():
+
+		#Make sure only approved parents can access this page
+		user = request.user
+
+
 		student = get_object_or_404(Student, pk=student_id)
+
+		#If the user is a parent and they don't have approved access, kick them 
+		if hasattr(user, 'studentguardian'):
+
+			if not Relationship.objects.filter(student=student, guardian=user.studentguardian, student_approved=True):
+				return HttpResponse('You do not have access to this page yet')
+
+		#Kick any student's that are trying to access this page without permission
+
+		if hasattr(user, 'studentprofile'):
+
+			if user.studentprofile.student != student:
+				return HttpResponse('Unauthorized')
+				
+
 		profile = student.profile
 		enrollments = Enrollment.objects.filter(student=student).values_list('_class', 'coach_id')
 		upcoming_sessions = []
@@ -230,7 +274,9 @@ def student_profile(request, student_id):
 
 		skills = Subskill.objects.all()
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met)})
+
+		new_relations = Relationship.objects.filter(student=student, student_approved=False)
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': len(upcoming_sessions), 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations)})
 
 	else:
 		return render(request, 'attendance/login.html')
@@ -318,7 +364,7 @@ def coach_signup(request):
 		last_name = request.POST['last_name']
 			
 		if request.POST['coach_phrase'] == 'rule #22':
-			print('pass correct')
+			
 			try:
 
 				#Create a user object for these fields
@@ -353,10 +399,54 @@ def coach_signup(request):
 			'', 'last_name':'', 'email': '', 
 				'username': '' })
 
-#Decorator method to help us check if the user is a coach
-def group_check(user):
-    return user.groups.filter(name__in=['coaches'])
+#View to help parent's add their users
+@login_required
+def add_relation(request, guardian_id):
 
+	if hasattr(request.user, 'studentguardian'):
+		guardian = get_object_or_404(StudentGuardian, pk=guardian_id)
+		
+		if request.user.studentguardian == guardian:
+			
+			if request.method == 'POST':
+				students = request.POST.getlist('student')
+				#For all the student ids passed in we'll create a relation--these won't be approved yet however
+				for student_id in students:
+					student = get_object_or_404(Student, pk=int(student_id))
+					Relationship.objects.create(guardian=guardian, student=student)
+
+				my_students = Relationship.objects.filter(guardian=guardian)
+				return redirect('attendance:parent_home', guardian_id=guardian.guardian_id)
+			#Otherwise we'll show them the table where they can add students
+			else:
+				students = Student.objects.all()
+				return render(request, 'attendance/guardian_reg.html', {'guardian': guardian, 'students': students})
+		else:
+			return HttpResponse('Unauthorized')
+	else:
+		return HttpResponse('Unauthorized')
+
+
+#View to pull up a parent's main page
+@login_required
+def parent_home(request, guardian_id):
+
+	#Get the guardian
+	guardian = get_object_or_404(StudentGuardian, pk=guardian_id)
+
+	#If this user has a guardian profile, then we'll compare them 
+	if hasattr(request.user, 'studentguardian'):
+
+		if request.user.studentguardian == guardian:
+			my_students = Relationship.objects.filter(guardian=guardian)
+
+			return render(request, 'attendance/parent_home.html', {'guardian': guardian, 'students': my_students })
+
+		else:
+			return HttpResponse('Unauthorized')
+	else:
+		return HttpResponse('Unauthorized')
+	
 #For the leave note view we make the user has coach permissions
 @user_passes_test(group_check)
 def leave_note(request, student_id):
@@ -493,13 +583,61 @@ def student_goals(request, student_id):
 	return render(request, 'attendance/goals.html', {'student':student, 'goals': goals})
 
 
-@login_required
-def skill_list(request, student_id):
+@user_passes_test(group_check)
+def mark_skill(request, student_id, skill_id):
 	student = get_object_or_404(Student, pk=student_id)
-	skills = Skill.objects.all()
+	skill = get_object_or_404(Skill, pk=skill_id)
 
-	return render(request, 'attendance/skills.html', {'student':student, 'skills': skills})
+	if request.method == 'POST':
+		#For all the skill ids that were marked achieved, we'll create a new student progress entry 
+		for skill_id in request.POST.getlist('achieved'):
+			subskill = get_object_or_404(Subskill, pk=int(skill_id))
+			
+			progress = StudentProgress.objects.filter(subskill=subskill, student=student)
+			
+			#If there is no progress object, then we'll need to create a new one
+			if not progress:
+				StudentProgress.objects.create(student=student, achieved=True, subskill=subskill)
+			else:
+				progress[0].achieved = True
+				progress[0].save()
 
+
+		#Now grab all the progress objects
+		student_progress = StudentProgress.objects.filter(student=student)
+
+		#For all of the student progress objects that aren't in the achieved tab, we'll mark them as unachieved
+		for row in student_progress:
+			if str(row.subskill.sub_id) not in request.POST.getlist('achieved'):
+				row.achieved = False
+				row.save()
+
+
+		return HttpResponseRedirect(reverse('attendance:skill_overview', args=(student_id, skill.skill_id)))
+	else:
+		#Grab all the subskills and all the ones the student has met
+		subskills = Subskill.objects.filter(skill=skill)
+		student_met = StudentProgress.objects.filter(student=student, achieved=True).values_list('subskill', flat=True)
+
+		subskill_list = []
+		#Go through all the subskills 
+		for subskill in subskills:
+			#Create a dict that holds the subskill and if it was achieved
+			subskill_dict = {}
+			if subskill.sub_id in student_met:
+				subskill_dict['achieved'] = True
+			else:
+				subskill_dict['achieved'] = False
+
+			subskill_dict['subskill'] = subskill
+
+			#Append that dict to the list of subskills
+			subskill_list.append(subskill_dict)
+
+		return render(request, 'attendance/mark_skill.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
+
+
+	
 
 @login_required
 def skill_overview(request, student_id, skill_id):
@@ -508,14 +646,14 @@ def skill_overview(request, student_id, skill_id):
 
 	#Grab all the subskills and all the ones the student has met
 	subskills = Subskill.objects.filter(skill=skill)
-	student_met = StudentProgress.objects.filter(student=student, achieved=True)
+	student_met = StudentProgress.objects.filter(student=student, achieved=True).values_list('subskill', flat=True)
 
 	subskill_list = []
 	#Go through all the subskills 
 	for subskill in subskills:
 		#Create a dict that holds the subskill and if it was achieved
 		subskill_dict = {}
-		if subskill in student_met:
+		if subskill.sub_id in student_met:
 			subskill_dict['achieved'] = True
 		else:
 			subskill_dict['achieved'] = False
@@ -525,7 +663,6 @@ def skill_overview(request, student_id, skill_id):
 		#Append that dict to the list of subskills
 		subskill_list.append(subskill_dict)
 
-	print(subskill_list)
 	return render(request, 'attendance/skill_overview.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
 @login_required
@@ -544,26 +681,66 @@ def student_skills(request, student_id):
 		
 		#Grab all the subskills and all the ones the student has met
 		subskills = Subskill.objects.filter(skill=skill)
-		student_met = StudentProgress.objects.filter(student=student, achieved=True)
-		
-		subskill_list = []
-		#Go through all the subskills 
-		for subskill in subskills:
-			#Create a dict that holds the subskill and if it was achieved
-			subskill_dict = {}
-			if subskill in student_met:
-				subskill_dict['achieved'] = True
-			else:
-				subskill_dict['achieved'] = False
+		student_met = StudentProgress.objects.filter(subskill__skill=skill,student=student, achieved=True)
 
-			subskill_dict['subskill'] = subskill
+		skill_dict['met'] = len(student_met)
+		skill_dict['total'] = len(subskills)
 
-			#Append that dict to the list of subskills
-			subskill_list.append(subskill_dict)
-
-		#Add that subskill list to the skill dict as subskills 
-		skill_dict['subskills'] = subskill_list
 		#Add them to the final list 
 		skill_list.append(skill_dict)
 
 	return render(request, 'attendance/skills.html', {'student': student, 'skills': skill_list})
+
+
+
+@login_required
+def approve_parent(request, student_id):
+
+	student = get_object_or_404(Student, pk=student_id)
+
+	if request.user.is_authenticated():
+
+		if hasattr(request.user, 'studentprofile'):
+
+			if request.user.studentprofile == student.profile:
+
+				#Grab all the current relationships for this user
+				relationships = Relationship.objects.filter(student=student)
+				#Figure out which one's we need to update in the database
+				if request.method == 'POST':
+
+					approved = request.POST.getlist('approved')
+					#Update all the relationships based on what's approved and what's not approved
+					for relation in relationships:
+						if relation.relation_id in approved:
+							relation.student_approved = True
+							relation.save()
+						else:
+							relation.student_approved = False
+							relation.save()
+
+					remove = request.POST.getlist('remove')
+
+					#Delete all checked removal boxes here
+					for relation_id in remove:
+						relation = get_object_or_404(Relationship, pk=relation_id)
+						relation.delete()
+
+
+					return redirect('attendance:student_profile', student_id=student.student_id)
+				else:
+
+					return render(request, 'attendance/approve_parent.html', {'relationships': relationships, 'student': student})
+				
+
+
+			else:
+				return HttpResponse('Unauthorized')
+
+
+		else:
+			return HttpResponse('Unauthorized')
+
+	else:
+		return HttpResponse('Unauthorized')
+

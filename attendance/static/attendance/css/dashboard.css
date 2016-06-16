@@ -30,6 +30,11 @@ h1.title {
 	color: black;
 }
 
+h1 {
+    font-family: 'Exo', sans-serif;
+    color: black;
+}
+
 h2.bio {
 	font-family: 'Exo', sans-serif;
 	color:black;
@@ -66,12 +71,19 @@ th {
 
 .pure-button-primary {
     background-color: #5CB85C;
+    font-family: 'Exo', sans-serif;
 }
 
 a:link.dashboard-link  {color:#FFFFFF; background-color:transparent; text-decoration:none}
 a:visited.dashboard-link {color:#FFFFFF; background-color:transparent; text-decoration:none}
 a:hover.dashboard-link   {color:#F6AE2D; background-color:transparent; text-decoration:underline}
 a:active.dashboard-link {color:#F6AE2D; background-color:transparent; text-decoration:underline}
+
+
+a:link.footer-link  {color:#F6AE2D; background-color:transparent; text-decoration:none}
+a:visited.footer-link {color:#F6AE2D; background-color:transparent; text-decoration:none}
+a:hover.footer-link   {color:#F26419; background-color:transparent; text-decoration:underline}
+a:active.footer-link {color:#F6AE2D; background-color:transparent; text-decoration:underline}
 
 .dashboard-piece {
     min-height: 300px;
@@ -158,6 +170,44 @@ a:active.dashboard-link {color:#F6AE2D; background-color:transparent; text-decor
 }
 .dashboard-metric i {
     margin-right: 0.6em;
+}
+
+.bar-horizontal {
+    height: 40px;
+    background-color: rgba(255,255,255,0.4);
+    position: relative;
+    display: block;
+    margin-top: 20px;
+    font-family: 'Exo', sans-serif;
+}
+.bar-horizontal-bar {
+    background: #fff;
+    font-family: 'Exo', sans-serif;
+    height: 40px;
+    line-height: 36px;
+    color: #444;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.8em;
+    letter-spacing: 0.2em;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.bar-vertical {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    background: rgba(200,200,200,0.5);
+}
+
+footer {
+    background: gray;
+    color: #aaa;
+    padding: 10px;
+    font-size: 0.6em;
+    font-weight: bold;
 }
 
 

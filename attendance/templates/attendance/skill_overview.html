@@ -3,16 +3,25 @@
 {% block content %}   
 
 
+
     {% for group in user.groups.all %}
         {% if group.name == 'coaches' %}
             <div class="pure-menu pure-menu-horizontal">
-                <p class="pure-menu-heading">{{student}}</p>
+                <p class="pure-menu-heading">{{user.coach}}</p>
                 <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a href="{% url 'attendance:leave_note' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-sticky-note fa-2x" aria-hidden="true"></i>  leave note</a></li>
+                    <li class="pure-menu-item"><a href="{% url 'attendance:mark_skill' student_id=student.student_id skill_id=skill.skill_id %}" class="pure-menu-link"><i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>  mark progress</a></li>
                 </ul>
             </div>
         {% endif %}
+
     {% endfor %} 
+
+           <div class="pure-menu pure-menu-horizontal">
+               <p class="pure-menu-heading">{{student}}</p>
+               <ul class="pure-menu-list">
+                   <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a></li>
+               </ul>
+           </div>
 
     <style>
         a:link.pure-menu-link  {color:#F6AE2D; background-color:transparent; text-decoration:none}
@@ -47,7 +56,7 @@
 
                       <div class="pure-u-5-6 dashboard-piece-tealbg">
                          
-                         <p><h2 class="subskill"><i class="fa fa-check"></i>
+                         <p><h2 class="subskill"><i class="fa fa-check-square-o"></i>
                              {{subskill.subskill.description}}</h2></p>
                       </div>
 

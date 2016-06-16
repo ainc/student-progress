@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from .choices import ICON_CHOICES
 
 #Coach table
 class Coach(models.Model):
@@ -54,7 +55,19 @@ class StudentProfile(models.Model):
 class StudentGuardian(models.Model):
 	guardian_id = models.AutoField(primary_key=True)
 	name = models.CharField(max_length=200)
+	user = models.OneToOneField(User, on_delete=models.CASCADE, default=10)
+
+	def __str__(self):
+		return self.name
+
+#Table to hold relationships between student's and guardians
+class Relationship(models.Model):
+	relation_id = models.AutoField(primary_key=True)
 	student = models.ForeignKey(Student, on_delete=models.CASCADE)
+	guardian = models.ForeignKey(StudentGuardian, on_delete=models.CASCADE)
+	student_approved = models.BooleanField(default=False)
+	def __str__(self):
+		return str(self.guardian)
 
 #Class table 
 class Class(models.Model):
@@ -106,6 +119,8 @@ class StudentGoal(models.Model):
 class Skill(models.Model):
 	skill_id = models.AutoField(primary_key=True)
 	title = models.CharField(max_length=30)
+	#Go to fontawesome.io and find some sweet icons to add to a skill
+	font_awesome_icon = models.CharField(max_length=20, default='fa-tasks', choices=ICON_CHOICES)
 
 	def __str__(self):
 		return self.title

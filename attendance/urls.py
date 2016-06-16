@@ -17,6 +17,7 @@ urlpatterns = [
     url(r'^signup/coaches/$', views.coach_signup, name='coach_signup'),
     url(r'^student/(?P<student_id>\d+)/$', views.student_profile, name='student_profile'),
     url(r'^student/(?P<student_id>\d+)/update/$', views.update_profile, name='update_profile'),
+    url(r'^student/(?P<student_id>\d+)/approve_parent/$', views.approve_parent, name='approve_parent'),
     url(r'^student/(?P<student_id>\d+)/notes/$', views.student_notes, name='student_notes'),
     url(r'^student/(?P<student_id>\d+)/notes/leave/$', views.leave_note, name='leave_note'),
     url(r'^student/(?P<student_id>\d+)/goals/$', views.student_goals, name='student_goals'),
@@ -24,6 +25,8 @@ urlpatterns = [
     url(r'^student/(?P<student_id>\d+)/goals/mark/(?P<goal_id>\d+)/$', views.mark_goal, name='mark_goal'),
     url(r'^student/(?P<student_id>\d+)/skills/$', views.student_skills, name='student_skills'),
     url(r'^student/(?P<student_id>\d+)/skill/(?P<skill_id>\d+)/subskills/$', views.skill_overview, name='skill_overview'),
-
+    url(r'^student/(?P<student_id>\d+)/skill/(?P<skill_id>\d+)/subskills/mark/$', views.mark_skill, name='mark_skill'),
+    url(r'^guardian/(?P<guardian_id>\d+)/add_relation/$', views.add_relation, name='add_relation'),
+    url(r'^guardian/(?P<guardian_id>\d+)/home/$', views.parent_home, name='parent_home'),
 
  ]
