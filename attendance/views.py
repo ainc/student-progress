@@ -12,6 +12,8 @@ from datetime import datetime
 
 '''
 	Decorators 
+
+	group_check -- for now, any coach will have the ability to edit/add information to any coach's classes
 '''
 
 #Decorator method to help us check if the user is a coach
@@ -260,11 +262,14 @@ def student_profile(request, student_id):
 		profile = student.profile
 		enrollments = Enrollment.objects.filter(student=student).values_list('_class', 'coach_id')
 		upcoming_sessions = []
+		num_upcoming = 0
 		for clas in enrollments:
 			dic = {}
 			dic['class'] = get_object_or_404(Class, pk=clas[0])
 			dic['coach'] = get_object_or_404(Coach, pk=clas[1])
-			dic['sessions'] = ClassSession.objects.filter(coach=clas[1], _class=clas[0], class_date__gte=datetime.now()).order_by('class_date')
+			sessions = ClassSession.objects.filter(coach=clas[1], _class=clas[0], class_date__gte=datetime.now()).order_by('class_date')
+			num_upcoming += len(sessions)
+			dic['sessions'] = sessions
 			upcoming_sessions.append(dic)
 		
 		goals_met = StudentGoal.objects.filter(student=student, met=True)
@@ -276,7 +281,7 @@ def student_profile(request, student_id):
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
 
 		new_relations = Relationship.objects.filter(student=student, student_approved=False)
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': len(upcoming_sessions), 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations)})
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations)})
 
 	else:
 		return render(request, 'attendance/login.html')
@@ -398,6 +403,27 @@ def coach_signup(request):
 		return render(request, 'attendance/coach_portal.html', {'duplicate_key': False, 'first_name': 
 			'', 'last_name':'', 'email': '', 
 				'username': '' })
+
+
+@user_passes_test(group_check)
+def coach_dashboard(request):
+	#Grab all coaches
+	coaches = Coach.objects.all()
+
+	coach_list = []
+
+	#Go through all the coaches and then gather how many classes they are teaching 
+	for coach in coaches:
+		coach_dict = {}
+		coach_dict['coach'] = coach
+		#This query will return a dictionary of all the unique classes this coach teaches
+		classes = ClassSession.objects.filter(coach=coach).values('_class').distinct()
+		coach_dict['classes'] = classes
+		coach_dict['num'] = len(classes)
+
+		coach_list.append(coach_dict)
+
+	return render(request, 'attendance/coach_dashboard.html', {'coaches': coach_list})
 
 #View to help parent's add their users
 @login_required

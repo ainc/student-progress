@@ -43,6 +43,7 @@ class StudentProfile(models.Model):
 	github_user_name = models.CharField(max_length=30)
 	bio = models.CharField(max_length=140)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
+	profile_img_url = models.CharField(max_length=150, default='https://avatars3.githubusercontent.com/u/3189845?v=3&s=200')
 
 	class Meta:
 		verbose_name_plural = 'Student profiles'

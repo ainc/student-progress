@@ -22,6 +22,7 @@ h1, h2, h3{
     font-size: large;
 }
 
+
 .white:hover{
     background-color: white;
     color: black;
@@ -160,3 +161,49 @@ hr {
             background-color: #FFCCBA;
             background-image: url('http://i.imgur.com/GnyDvKN.png');
         }
+
+footer {
+    background: gray;
+    color: #aaa;
+    padding: 10px;
+    font-size: 0.6em;
+    font-weight: bold;
+}
+
+
+/*  
+Sticky Footer Solution
+by Steve Hatcher 
+http://stever.ca
+http://www.cssstickyfooter.com
+*/
+
+* {margin:0;padding:0;} 
+
+html, body {height: 100%;}
+
+#wrap {min-height: 100%;}
+
+#main {overflow:auto;
+    padding-bottom: 180px;}  /* must be same height as the footer */
+
+#footer {position: relative;
+    margin-top: -180px; /* negative value of footer height */
+    height: 180px;
+    clear:both;} 
+
+/*Opera Fix*/
+body:before {/* thanks to Maleika (Kohoutec)*/
+content:"";
+height:100%;
+float:left;
+width:0;
+margin-top:-32767px;/* thank you Erik J - negate effect of float*/
+}
+
+
+input {
+    color: black;
+}
+
+

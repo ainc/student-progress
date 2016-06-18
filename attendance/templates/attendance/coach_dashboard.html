@@ -1,0 +1,67 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %} 
+
+
+ <style>
+        a:link.dashboard-link  {color:white; background-color:transparent; text-decoration:none}
+        a:visited.dashboard-link  {color:white; background-color:transparent; text-decoration:none}
+        a:hover.dashboard-link    {color:white; background-color:transparent; text-decoration:underline}
+        a:active.dashboard-link   {color:white; background-color:transparent; text-decoration:underline}
+</style>
+
+<section class="dashboard">
+
+
+    <div class="pure-g">
+        <div class="pure-u-1 dashboard-piece dashboard-piece-logo">
+        <h1 class="title">
+            Coach Dashboard
+        </h1>
+        </div>
+    </div>
+
+
+    <div class="pure-g">
+
+        <div class="pure-u-2-24"> </div> 
+
+        {% for entry in coaches %}
+
+            <div class="pure-u-6-24 dashboard-piece dashboard-piece-redbg">
+                <div class="dashboard-content">
+                    <h2><i class="fa fa-user fa-4x"></i></h2>
+                    <p class="dashboard-metric"> <a class="dashboard-link" href="{% url 'attendance:classes_for_coach' coach_id=entry.coach.coach_id %}"> {{entry.coach}} </a> </p>
+
+                        <div class="dashboard-metric">
+                                            <strong><small>{{entry.num}}</small></strong><br><small>Classes</small>
+                        </div>
+
+                </div>
+            </div>
+
+            {% if forloop.counter|divisibleby:3 %}
+
+                <div class="pure-u-2-24"> </div>
+
+                </div>
+
+                <br> <br>
+
+                <div class="pure-g">
+
+                    <div class="pure-u-2-24"> </div> 
+
+            {% else %}
+
+                <div class="pure-u-1-24"> </div>
+            {% endif %}
+
+        {% endfor %}
+        
+    
+    
+</section>
+
+
+{% endblock %}

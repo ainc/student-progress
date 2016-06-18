@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.home_page, name='home_page'),
+    url(r'^coach/dashboard/$', views.coach_dashboard, name='coach_dashboard'),
     url(r'^coach/(?P<coach_id>\d+)/roster/(?P<class_id>\d+)/$', views.class_roster, name='class_roster'),
     url(r'^coach/(?P<coach_id>\d+)/attendance/(?P<class_id>\d+)/session/(?P<session_id>\d+)$', views.class_session, name='class_session'),
     url(r'^coach/(?P<coach_id>\d+)/classes/$', views.classes_for_coach, name='classes_for_coach'),

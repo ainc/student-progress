@@ -30,6 +30,12 @@ h1.title {
 	color: black;
 }
 
+h2.title {
+    font-family: 'Exo', sans-serif;
+    color: black;
+    font-size: 40pt;    
+}
+
 h1 {
     font-family: 'Exo', sans-serif;
     color: black;
@@ -203,12 +209,17 @@ a:active.footer-link {color:#F6AE2D; background-color:transparent; text-decorati
 }
 
 footer {
-    background: gray;
+    background: white;
     color: #aaa;
     padding: 10px;
     font-size: 0.6em;
     font-weight: bold;
 }
+
+.img {
+    margin: 0 auto;
+}
+
 
 
 

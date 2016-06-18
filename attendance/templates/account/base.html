@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student progress</title>
+
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    {% load staticfiles %}
+
+    <link rel="stylesheet" type="text/css" href="{% static 'attendance/css/style.css' %}" />
+
+    <link rel="stylesheet" type="text/css" href="{% static 'attendance/font-awesome-4.6.3/css/font-awesome.min.css' %}" />
+
+</head>
+
+<body>
+
+
+    <div id="wrap">
+
+        <div id="main">
+                    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed nav-bar">
+                        <a class="pure-menu-heading" href="http://awesomeinc.org">
+                            <img alt="Awesome Inc U" src="{% static 'attendance/images/Logo_Horizontal_white.png' %}"> 
+                        </a>
+
+                        <ul class="pure-menu-list">
+                            <li class="pure-menu-item"><a href="{% url 'attendance:signup' %}" class="pure-menu-link">Sign Up</a></li>
+                            <li class="pure-menu-item"><a href="{% url 'attendance:login' %}" class="pure-menu-link">Login</a></li>
+                        </ul>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                
+               {% block content%}
+
+               {% endblock %}
+        </div>
+
+    </div>
+
+    <div id="footer">
+
+    </div>
+
+
+</body>
+
+<footer>
+    <h2> Developed by <a class="footer-link" href="http://peterkaminski.me" >Peter Kaminski</a> </h2>
+</footer>
+</html>
