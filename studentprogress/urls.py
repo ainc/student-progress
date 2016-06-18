@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('attendance.urls', namespace="attendance")),
+    url(r'^accounts/', include('allauth.urls')),
+    url(r'^accounts/profile/', TemplateView.as_view(template_name='attendance/student_profile.html')),
+    url(r'^accounts/signup/', TemplateView.as_view(template_name='attendance/signup.html')),
 ]
