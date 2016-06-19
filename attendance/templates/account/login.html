@@ -1,33 +1,50 @@
-{% extends 'account/base.html' %}
+{% extends 'attendance/base.html' %}
 
-{% load i18n %}
-{% load account %}
+{% block content %}   
 
 
-{% block content %}
-    <a href="/accounts/facebook/login/"><div class="fb"></div></a>
-    {% include "socialaccount/snippets/login_extra.html" %}
-    <div class="inset">
-        <div class="header">Or sign in directly</div>
-        <form class="login" method="POST" action="{% url 'account_login' %}">
-          {% csrf_token %}
-            {{ form.non_field_errors }}
-            <input id="id_login" class="login-input" maxlength="30" name="login" placeholder="Username" type="text" />{{ form.login.errors }}<br>
-            <input id="id_password"  class="login-input" name="password" placeholder="Password" type="password" />{{ form.password.errors }}<br>
-            <div class="remember-forgot-section">
-                <input id="id_remember" name="remember" type="checkbox" />
-                <label for="id_remember">Remember Me</label>
-                <a class="forgot" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-            </div>
-          {% if redirect_field_value %}
-          <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-          {% endif %}
+<div align="center">
 
-          <button class="btn" type="submit">{% trans "Sign In" %}</button>
-        </form>
+    <h1> Login </h1>
 
-        <div class="footnote">
-            Don't have an account? Login with Facebook above or <a href="{% url 'account_signup' %}">Sign Up</a>
+    <form class="pure-form pure-form-stacked" action="" method="post">
+            {% csrf_token %}
+    <fieldset>
+
+        <div class="pure-control-group">
+            <label for="username"></label>
+            <input name="username" id="username" type="text" placeholder="Username" required>
         </div>
-    </div>
+        <br>
+        <div class="pure-control-group">
+            <label for="password"></label>
+            <input name="password" id="password" type="password" placeholder="Password" required>
+        </div>
+        <br>
+        <div class="pure-controls">
+            <button type="submit" class="pure-button pure-button-primary">Submit</button>
+            {% if not_found %}
+
+                <div class="error">User not found</div>
+
+            {% endif %}
+
+            {% if error %}
+
+                <div class="error">User not active. Please try again later</div>
+
+            {% endif %}
+        </div>
+        <br>
+        
+        {% load socialaccount %}
+        <p><i class="fa fa-github fa-4x"></i><a href="{% provider_login_url "github" %}"> <big>Login with Github</big></a></p>
+    </fieldset>
+</form>    
+
+</div>
+
+
+
+
 {% endblock %}

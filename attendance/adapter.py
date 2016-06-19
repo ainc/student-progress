@@ -7,6 +7,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 	def save_user(self, request, sociallogin, form=None):
 		user = super(SocialAccountAdapter, self).save_user(request, sociallogin, form)
 		print(form)
+
+		#If this is a coach signing up then we'll create a coach account for them 
+		if request.session['coach_signup']:
+			Coach.objects.create(first_name=user.first_name, last_name='', user=user)
+			return user
 		#Create our student here
 		profile = StudentProfile.objects.create(email=user.email, user=user, github_user_name=user.username, bio=sociallogin.account.extra_data['bio'], profile_img_url=sociallogin.account.extra_data['avatar_url'])
 		Student.objects.create(first_name=user.first_name, last_name='', profile=profile)
@@ -28,6 +33,22 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
 
 class MyAccountAdapter(DefaultAccountAdapter):
+
+	def save_user(self, request, user, form, commit=True):
+
+		user = super(MyAccountAdapter, self).save_user(request, user, form)
+
+		data = form.cleaned_data
+
+		print(data)
+
+		if data.get('type_of_user') == 'student':
+			profile = StudentProfile.objects.create(email=user.email, user=user)
+			Student.objects.create(first_name=user.first_name, last_name=user.last_name, profile=profile)
+
+		print(data)
+
+
 
 	def get_login_redirect_url(self, request):
 		if hasattr(request.user, 'studentprofile'):

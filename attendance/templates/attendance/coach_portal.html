@@ -14,6 +14,10 @@
     <fieldset>
         <legend class="legend"><h1> Create a Coach Account </h1></legend>
 
+        {% load socialaccount %}
+
+        <p><i class="fa fa-github fa-4x"></i><a href="{% url 'attendance:coach_verify'%}?next={% provider_login_url "github" %}"> <big>Coaches--Sign up with Github</big></a></p>
+
         <label for="fname">First name</label>
         <input name="first_name" id="fname" type="text" placeholder="John" value="{{first_name}}" required>
 

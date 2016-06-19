@@ -1,0 +1,63 @@
+{% extends 'attendance/base.html' %}
+
+{% block content %}   
+
+<div id="outter-signup-form">
+    <div id="inner-signup-form">
+
+    <br> 
+    <br> 
+
+
+     {% load staticfiles %}
+
+    <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+
+    <script>
+
+        $(document).ready(function(){
+           $("#submit").attr("disabled", "true");  
+           $('#coach_phrase').keyup(function() {
+                if ($(this).val() == "rule #22") {
+                    $("#submit").removeAttr("disabled");
+                } else {
+                    $("#submit").attr("disabled", "true");        
+                }
+           });
+
+
+           
+        });
+    </script>
+
+    {% load socialaccount %}
+    <form class="pure-form pure-form-stacked" action="{% provider_login_url "github" %}" method="post">
+            {% csrf_token %}
+    <fieldset>
+        <legend class="legend"><h1> Enter coach passphrase </h1></legend>
+
+       
+        <label for="coach_phrase">Coach key</label>
+        <input name="coach_phrase" id="coach_phrase" type="password" placeholder="Ask Nick" required>
+
+        <br>
+
+        <button type="submit" id="submit" class="pure-button pure-button-primary">Submit</button>
+    </fieldset>
+    </form>    
+
+        {% if wrong_phrase %}
+
+                <div class="error">Wrong secret phrase. Contact Nick Such</div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+
+
+
+
+
+{% endblock %}

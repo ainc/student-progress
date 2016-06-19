@@ -1,6 +1,7 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 
 from . import views 
 
@@ -15,7 +16,9 @@ urlpatterns = [
     url(r'^coach/(?P<coach_id>\d+)/create_session/(?P<class_id>\d+)/$', views.create_session, name='create_session'),
     url(r'^login/$', views.login, name='login'),
     url(r'^signup/$', views.signup, name='signup'),
+    url(r'^logout/$', auth_views.logout,{'next_page': '/login/'}, name='auth_logout'),
     url(r'^signup/coaches/$', views.coach_signup, name='coach_signup'),
+    url(r'^signup/coaches/verify/$', views.coach_verify, name='coach_verify'),
     url(r'^student/(?P<student_id>\d+)/$', views.student_profile, name='student_profile'),
     url(r'^student/(?P<student_id>\d+)/update/$', views.update_profile, name='update_profile'),
     url(r'^student/(?P<student_id>\d+)/approve_parent/$', views.approve_parent, name='approve_parent'),

@@ -22,5 +22,4 @@ urlpatterns = [
     url(r'^', include('attendance.urls', namespace="attendance")),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^accounts/profile/', TemplateView.as_view(template_name='attendance/student_profile.html')),
-    url(r'^accounts/signup/', TemplateView.as_view(template_name='attendance/signup.html')),
 ]

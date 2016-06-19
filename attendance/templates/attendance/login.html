@@ -10,6 +10,7 @@
     <form class="pure-form pure-form-stacked" action="" method="post">
             {% csrf_token %}
     <fieldset>
+
         <div class="pure-control-group">
             <label for="username"></label>
             <input name="username" id="username" type="text" placeholder="Username" required>
@@ -34,6 +35,10 @@
 
             {% endif %}
         </div>
+        <br>
+        
+        {% load socialaccount %}
+        <p><i class="fa fa-github fa-4x"></i><a href="{% provider_login_url "github" %}"> <big>Login with Github</big></a></p>
     </fieldset>
 </form>    
 

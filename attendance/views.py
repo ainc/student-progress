@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login as login_user
 from django.db import IntegrityError
+
 # Create your views here.
 from datetime import datetime
 
@@ -769,4 +770,21 @@ def approve_parent(request, student_id):
 
 	else:
 		return HttpResponse('Unauthorized')
+
+
+
+#Short view to verify that a coach is being signed up
+def coach_verify(request):
+
+	if request.method == 'POST':
+
+		if request.POST['coach_phrase'] == 'rule #22':
+
+			return resolve('accounts/github/login')
+		else:
+			return render(request, 'attendance/coach_verify.html', {'wrong_phrase': True})
+
+	request.session['coach_signup'] = True
+
+	return render(request, 'attendance/coach_verify.html')
 
