@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian
+from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian, Team, TeamMember
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
@@ -21,7 +21,22 @@ from datetime import datetime
 def group_check(user):
     return user.groups.filter(name__in=['coaches'])
 
+#Helper function to let us know if this current user has the authorization to access this page 
+def has_access(request, coach_id, class_id):
+	if hasattr(request.user, 'coach'):
+		can_access = False
 
+		coach = Coach.objects.get(pk=coach_id)
+		clas = Class.objects.get(pk=class_id)
+		if request.user.coach == coach:
+			can_access = True
+
+		if request.user.coach.coach_id in TeamMember.objects.filter(team__head_coach=coach, team___class=clas).values_list('assistant_coach', flat=True):
+			can_access = True
+
+		return can_access
+	else:
+		return False
 
 def home_page(request):
 	return render(request, 'attendance/home_page.html', {})
@@ -34,6 +49,9 @@ Coaches methods
 #View to render the roster for a coach and a class
 @user_passes_test(group_check)
 def class_roster(request, coach_id, class_id):
+	if not has_access(request, coach_id, class_id):
+		return HttpResponse('not authorized')
+
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
 	query_set = Enrollment.objects.filter(coach=coach, _class=clas)
@@ -43,6 +61,9 @@ def class_roster(request, coach_id, class_id):
 #View to render the roster and the edit attendance for a coach, a class, and a class session
 @user_passes_test(group_check)
 def class_session(request, coach_id, class_id, session_id):
+	if not has_access(request, coach_id, class_id):
+		return HttpResponse('not authorized')
+
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
 	session = get_object_or_404(ClassSession, pk=session_id)
@@ -98,12 +119,23 @@ def classes_for_coach(request, coach_id):
 		entryDict["class_id"] = value['_class']
 		classes.append(entryDict)
 
-	return render(request, 'attendance/class_list.html', {'classes': classes, 'coach': coach})
+	#For all the classes where our coach is an assistant, we'll go through and store those values too
+	assistant_classes = []
+	for entry in TeamMember.objects.filter(assistant_coach=coach):
+		assist_dict = {}
+		assist_dict['class'] = entry.team._class
+		assist_dict['head_coach'] = entry.team.head_coach
+		assistant_classes.append(assist_dict)
+
+
+	return render(request, 'attendance/class_list.html', {'classes': classes, 'coach': coach, 'assistant_classes': assistant_classes})
 
 
 #View to show an attendance overview for each student--showing how often they have come to the class
 @user_passes_test(group_check)
 def class_overview(request, class_id, coach_id):
+	if not has_access(request, coach_id, class_id):
+		return HttpResponse('not authorized')
 	#Get the coach, class, and students
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -200,7 +232,7 @@ def signup(request):
 
 #View for a standard login page
 def login(request):
-
+	print('login')
 	#post will authenticate a user 
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -377,7 +409,6 @@ def coach_signup(request):
 				user = User.objects.create_user(username, email, password)
 				user.first_name = first_name
 				user.last_name = last_name
-				user.is_staff = True
 				#Add the coach to the coaches group
 				group = Group.objects.get(name='coaches')
 				user.groups.add(group)
@@ -420,9 +451,12 @@ def coach_dashboard(request):
 		#This query will return a dictionary of all the unique classes this coach teaches
 		classes = ClassSession.objects.filter(coach=coach).values('_class').distinct()
 		coach_dict['classes'] = classes
+		teams = TeamMember.objects.filter(assistant_coach=coach)
 		coach_dict['num'] = len(classes)
+		coach_dict['num_assistant'] = len(teams)
 
 		coach_list.append(coach_dict)
+
 
 	return render(request, 'attendance/coach_dashboard.html', {'coaches': coach_list})
 

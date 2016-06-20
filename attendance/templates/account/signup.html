@@ -9,7 +9,7 @@
     <br> 
 
     
-    <form class="pure-form pure-form-stacked" action="" method="post">
+    <form class="pure-form pure-form-stacked" action="{% url 'attendance:signup' %}" method="post">
             {% csrf_token %}
     <fieldset>
         <legend class="legend"><h1> Sign up </h1></legend>

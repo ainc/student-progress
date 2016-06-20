@@ -7,7 +7,7 @@
 
     <h1> Login </h1>
 
-    <form class="pure-form pure-form-stacked" action="" method="post">
+    <form class="pure-form pure-form-stacked" action="{% url 'attendance:login' %}" method="post">
             {% csrf_token %}
     <fieldset>
 

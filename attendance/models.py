@@ -10,6 +10,7 @@ class Coach(models.Model):
 	first_name = models.CharField(max_length=20)
 	last_name = models.CharField(max_length=20)
 	user = models.OneToOneField(User, on_delete=models.CASCADE) 
+	profile_img_url = models.CharField(max_length=150, default='https://avatars3.githubusercontent.com/u/3189845?v=3&s=460')
 
 	def __str__(self):
 		to_string = ''
@@ -43,7 +44,7 @@ class StudentProfile(models.Model):
 	github_user_name = models.CharField(max_length=30)
 	bio = models.CharField(max_length=140)
 	user = models.OneToOneField(User, on_delete=models.CASCADE)
-	profile_img_url = models.CharField(max_length=150, default='https://avatars3.githubusercontent.com/u/3189845?v=3&s=200')
+	profile_img_url = models.CharField(max_length=150, default='https://avatars3.githubusercontent.com/u/3189845?v=3&s=460')
 
 	class Meta:
 		verbose_name_plural = 'Student profiles'
@@ -80,6 +81,26 @@ class Class(models.Model):
 
 	class Meta:
 		verbose_name_plural = 'Class'
+
+
+#A teaching team will have a class it is related to--meaning that a team will need to be created to coach a class 
+class Team(models.Model):
+	team_id = models.AutoField(primary_key=True)
+	_class = models.ForeignKey(Class, on_delete=models.CASCADE)
+	head_coach = models.ForeignKey(Coach, on_delete=models.CASCADE, default=1)
+
+	def __str__(self):
+		return str(self._class)
+
+#A team member will relate a coach to a teaching team. A coach will thus have a list of teaching teams they are a member of--giving them permissions to modify that particular class 
+class TeamMember(models.Model):
+	team_member_id = models.AutoField(primary_key=True)
+	team = models.ForeignKey(Team, on_delete=models.CASCADE) 
+	assistant_coach = models.ForeignKey(Coach, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return str(self.assistant_coach) + ' ' + str(self.team)
+
 
 #Table to show which classes a student is enrolled in, and who the primary coach is. 
 class Enrollment(models.Model):

@@ -30,12 +30,20 @@
 
             <div class="pure-u-6-24 dashboard-piece dashboard-piece-redbg">
                 <div class="dashboard-content">
-                    <h2><i class="fa fa-user fa-4x"></i></h2>
+                    <br>
+                    <div class="roundedImage img"> <img src="{{entry.coach.profile_img_url}}" style="width:150px;heigh=150px;"></div>
                     <p class="dashboard-metric"> <a class="dashboard-link" href="{% url 'attendance:classes_for_coach' coach_id=entry.coach.coach_id %}"> {{entry.coach}} </a> </p>
 
                         <div class="dashboard-metric">
-                                            <strong><small>{{entry.num}}</small></strong><br><small>Classes</small>
+                                            <strong><small>{{entry.num}}</small></strong><br><small>Lead</small>
                         </div>
+
+                        <div class="light bar-horizontal">
+                                               <div class="bar-horizontal-bar" style="width:100%">
+                                                   {{entry.num_assistant}} assistant 
+                                               </div>
+                        </div>
+
 
                 </div>
             </div>
@@ -62,6 +70,34 @@
     
     
 </section>
+
+<style>
+
+        .roundedImage {
+            background-repeat: no-repeat;
+            background-size: cover;
+            
+            overflow:hidden;
+            -webkit-border-radius:50px;
+            -moz-border-radius:50px;
+            border-radius:15px;
+            width:150px;
+            height:150px;
+        }
+
+        img {
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow:hidden;
+            -webkit-border-radius:50px;
+            -moz-border-radius:50px;
+            border-radius:15px;
+            width:150px;
+            height:150px;
+        }
+
+
+</style>
 
 
 {% endblock %}

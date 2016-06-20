@@ -9,7 +9,7 @@
         <table class="pure-table center pure-table-horizontal">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Role</th>
                     <th>Class</th>
                 </tr>
             </thead>
@@ -19,16 +19,30 @@
                 {% for class in classes %}
 
                 <tr>
-                    <td> {{ forloop.counter }}</td>
+                    <td> Lead </td>
                     <td> <a href="{% url 'attendance:class_roster' class_id=class.class_id coach_id=coach.coach_id %}"> {{ class.class }} </a> </td>
                     
                 </tr>
 
                 {% endfor %}
 
+                {% for entry in assistant_classes %}
+
+                <tr>
+                    <td> Assistant </td>
+                    <td> <a href="{% url 'attendance:class_roster' class_id=entry.class.class_id coach_id=entry.head_coach.coach_id %}"> {{ entry.class }} </a> </td>
+                    
+                </tr>
+
+                {% endfor %}
+
+
+
             </tbody>
 
     </table>
+
+
 
     <ul class="pure-menu-list">
         <li class="pure-menu-item"><a href="{% url 'attendance:coach_dashboard'%}" class="pure-menu-link white"><i class="fa fa-dashboard" aria-hidden="true"></i> - Dashboard</a></li>

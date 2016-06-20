@@ -9,9 +9,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 		
 		user = super(SocialAccountAdapter, self).save_user(request, sociallogin, form)
 
+		profile_img_url = sociallogin.account.extra_data['avatar_url']
+
 		#If this is a coach signing up then we'll create a coach account for them 
 		if 'coach_signup' in request.session.keys():
-			Coach.objects.create(first_name=user.first_name, last_name='', user=user)
+			Coach.objects.create(first_name=user.first_name, last_name=user.last_name, user=user, profile_img_url=profile_img_url)
 
 			#Add the coach to the coaches group
 			group = Group.objects.get(name='coaches')
@@ -19,7 +21,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 			user.save()
 			return user
 		#Create our student here
-		profile = StudentProfile.objects.create(email=user.email, user=user, github_user_name=user.username, bio=sociallogin.account.extra_data['bio'], profile_img_url=sociallogin.account.extra_data['avatar_url'])
+		profile = StudentProfile.objects.create(email=user.email, user=user, github_user_name=user.username, bio=sociallogin.account.extra_data['bio'], profile_img_url=profile_img_url)
 		Student.objects.create(first_name=user.first_name, last_name='', profile=profile)
 		
 		return user
@@ -31,6 +33,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
 		if data['name']:
 			user.first_name = data['name']
+			user.last_name = ''
 		else:
 			user.first_name = 'New'
 			user.last_name = 'User'
