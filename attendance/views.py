@@ -7,9 +7,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
 from django.contrib.auth import login as login_user
 from django.db import IntegrityError
+from allauth.socialaccount.models import SocialToken
 
 # Create your views here.
 from datetime import datetime
+
+from gitstat.git import git_zen
 
 '''
 	Decorators 
@@ -276,6 +279,17 @@ def student_profile(request, student_id):
 		user = request.user
 
 
+		tokens = SocialToken.objects.filter(account__user=user, account__provider='github')
+		
+
+		total_commits = 1
+		#We'll log in to their github account and git some good information : ) 
+		if tokens:
+			token = tokens[0].token
+
+		
+		zen = git_zen()
+
 		student = get_object_or_404(Student, pk=student_id)
 
 		#If the user is a parent and they don't have approved access, kick them 
@@ -314,7 +328,7 @@ def student_profile(request, student_id):
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
 
 		new_relations = Relationship.objects.filter(student=student, student_approved=False)
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations)})
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations), 'zen': zen})
 
 	else:
 		return render(request, 'attendance/login.html')
@@ -771,9 +785,10 @@ def approve_parent(request, student_id):
 				if request.method == 'POST':
 
 					approved = request.POST.getlist('approved')
+					
 					#Update all the relationships based on what's approved and what's not approved
 					for relation in relationships:
-						if relation.relation_id in approved:
+						if str(relation.relation_id) in approved:
 							relation.student_approved = True
 							relation.save()
 						else:
