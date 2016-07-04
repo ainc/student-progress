@@ -284,16 +284,12 @@ def student_profile(request, student_id):
 
 		github_username = 'ainc'
 
-		total_commits = 1
-		#We'll log in to their github account and git some good information : ) 
-		if tokens:
-			github_username = request.user.username
-
-
-		
-		zen = git_zen()
-
 		student = get_object_or_404(Student, pk=student_id)
+
+		#We'll log in to their github account and git some good information : ) 
+		if tokens or student.profile.github_user_name:
+			github_username = student.profile.github_user_name
+
 
 		#If the user is a parent and they don't have approved access, kick them 
 		if hasattr(user, 'studentguardian'):
@@ -535,7 +531,7 @@ def leave_note(request, student_id):
 		if request.method == 'POST':
 			note = request.POST['note']
 			CoachNote.objects.create(coach=request.user.coach, note=note, student=student)
-			return HttpResponseRedirect(reverse('attendance:student_notes', args=(student_id)))
+			return HttpResponseRedirect(reverse('attendance:student_profile', args=(student.student_id,)))
 		else:
 			return render(request, 'attendance/leave_note.html', {'student': student})
 
