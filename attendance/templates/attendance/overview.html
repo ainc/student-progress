@@ -26,7 +26,7 @@
                     <td> <a href="{% url 'attendance:class_session' coach_id=coach.coach_id class_id=class.class_id session_id=record.session.session_id%}"> {{record.session}} </td>
                     {% for item in record.records %}
                     <td> {{item.attended}} </td>
-                    <td> <div class='content'> <a>{{item.note}} </a> </div> </td>
+                    <td> <div class='content'> {{item.note}}  </div> </td>
                     {% endfor %}
                 </tr>
                 {% endfor %}

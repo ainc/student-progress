@@ -2,6 +2,8 @@
 
 {% block content %} 
 
+
+
 <section class="dashboard">
 
     {% if request.user.studentprofile.student.student_id == student.student_id %}
@@ -67,17 +69,21 @@
                 </p>
             </div>
         </div>
-        <div class="pure-u-1-3 dashboard-piece dashboard-piece-blackbg">
+        <div class="pure-u-1-3 dashboard-piece dashboard-piece-orangebg">
+
             <div class="dashboard-content">
-                <h2><i class="fa fa-github fa-4x"></i></h2>
-                <p class="dashboard-metric">
-                    Git Zen:
+                    <h2><i class="fa fa-code fa-4x"></i></h2><p class="dashboard-metric"> <a class="dash-link" href="{% url 'attendance:student_skills' student_id=student.student_id %}"> Skills </a></p>
 
                     <div class="dashboard-metric">
-                                        <p class="dashboard-metric"><span class="light">{{zen}}</span></p>
+
+                                        <div class="light bar-horizontal">
+                                               <div class="bar-horizontal-bar" style="width:{{percent_complete}}%">
+                                                   {{percent_complete}}% complete
+                                               </div>
+                                        </div>
                     </div>
-                </p>
             </div>
+            
         </div>
         <div class="pure-u-1-3 dashboard-piece dashboard-piece-bluebg">
             <div class="dashboard-content">
@@ -139,18 +145,16 @@
             </div>
         </div>
 
-        <div class="pure-u-1-2 dashboard-piece dashboard-piece-orangebg">
+        <div class="pure-u-1-2 dashboard-piece dashboard-piece-blackbg">
             <div class="dashboard-content">
-                    <h2><i class="fa fa-code fa-4x"></i></h2><p class="dashboard-metric"> <a class="dash-link" href="{% url 'attendance:student_skills' student_id=student.student_id %}"> Skills </a></p>
+                <h2><i class="fa fa-github fa-4x"></i></h2>
+                <p class="dashboard-metric">
+                    Github feed:
 
-                    <div class="dashboard-metric">
-
-                                        <div class="light bar-horizontal">
-                                               <div class="bar-horizontal-bar" style="width:{{percent_complete}}%">
-                                                   {{percent_complete}}% complete
-                                               </div>
-                                        </div>
+                    <div id="feed">
+                                        
                     </div>
+                </p>
             </div>
         </div>
     </div>
@@ -188,6 +192,25 @@
     </style>
     
 </div>
+
+            {% load staticfiles %}
+            <link rel="stylesheet" href="{% static 'activity-feed/octicons.min.css' %}">
+            <link rel="stylesheet" href="{% static 'activity-feed/github-activity-0.1.4.min.css' %}">
+
+            <script type="text/javascript" src="{% static 'activity-feed/mustache.min.js' %}"></script>
+            <script type="text/javascript" src="{% static 'activity-feed/github-activity-0.1.4.min.js' %}"></script>
+            <script>
+                GitHubActivity.feed({ username: '{{github_username}}', selector: '#feed', limit:5});
+            </script>
+            <style type="text/css">
+
+                    #feed{
+                        width: 95%;
+                        height: auto;
+                        margin: 0 auto;
+                        color: black;
+                    }
+            </style>
 
 
 

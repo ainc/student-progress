@@ -282,10 +282,13 @@ def student_profile(request, student_id):
 		tokens = SocialToken.objects.filter(account__user=user, account__provider='github')
 		
 
+		github_username = 'ainc'
+
 		total_commits = 1
 		#We'll log in to their github account and git some good information : ) 
 		if tokens:
-			token = tokens[0].token
+			github_username = request.user.username
+
 
 		
 		zen = git_zen()
@@ -328,7 +331,7 @@ def student_profile(request, student_id):
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
 
 		new_relations = Relationship.objects.filter(student=student, student_approved=False)
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations), 'zen': zen})
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations), 'github_username': github_username})
 
 	else:
 		return render(request, 'attendance/login.html')
