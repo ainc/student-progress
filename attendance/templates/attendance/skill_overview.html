@@ -9,19 +9,24 @@
             <div class="pure-menu pure-menu-horizontal">
                 <p class="pure-menu-heading">{{user.coach}}</p>
                 <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a href="{% url 'attendance:mark_skill' student_id=student.student_id skill_id=skill.skill_id %}" class="pure-menu-link"><i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>  mark progress</a></li>
+                    <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>
+                    <li class="pure-menu-item"><a href="{% url 'attendance:mark_skill' student_id=student.student_id skill_id=skill.skill_id %}" class="pure-menu-link"><i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>  mark progress</a></li> 
+                    <li class="pure-menu-item"><a href="{% url 'attendance:student_skills' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>                   
                 </ul>
             </div>
+        {%else%}
+
+          <div class="pure-menu pure-menu-horizontal">
+              <p class="pure-menu-heading">{{student}}</p>
+              <ul class="pure-menu-list">
+                  <li class="pure-menu-item"><a href="{% url 'attendance:student_skills' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>
+              </ul>
+          </div>
         {% endif %}
 
     {% endfor %} 
 
-           <div class="pure-menu pure-menu-horizontal">
-               <p class="pure-menu-heading">{{student}}</p>
-               <ul class="pure-menu-list">
-                   <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a></li>
-               </ul>
-           </div>
+          
 
     <style>
         a:link.pure-menu-link  {color:#F6AE2D; background-color:transparent; text-decoration:none}

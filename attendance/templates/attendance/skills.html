@@ -10,6 +10,27 @@
         a:active.dashboard-link   {color:white; background-color:transparent; text-decoration:underline}
 </style>
 
+{% for group in user.groups.all %}
+    {% if group.name == 'coaches' %}
+        <div class="pure-menu pure-menu-horizontal">
+            <p class="pure-menu-heading">{{user.coach}}</p>
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>
+                
+                <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>                   
+            </ul>
+        </div>
+    {%else%}
+
+      <div class="pure-menu pure-menu-horizontal">
+          <p class="pure-menu-heading">{{student}}</p>
+          <ul class="pure-menu-list">
+              <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>
+          </ul>
+      </div>
+    {% endif %}
+
+{% endfor %} 
 <section class="dashboard">
 
 

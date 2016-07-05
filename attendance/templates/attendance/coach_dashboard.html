@@ -10,6 +10,23 @@
         a:active.dashboard-link   {color:white; background-color:transparent; text-decoration:underline}
 </style>
 
+
+{% for group in user.groups.all %}
+    {% if group.name == 'coaches' %}
+        <div class="pure-menu pure-menu-horizontal">
+            
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>
+
+                <li class="pure-menu-item">
+                    <a href="{% url 'attendance:auth_logout' %}" class="pure-menu-link"><i class="fa fa-sign-out fa-2x" aria-hidden="true"></i> sign out</a>
+                </li>
+
+            </ul>
+        </div>
+    {% endif %}
+{% endfor %} 
+
 <section class="dashboard">
 
 

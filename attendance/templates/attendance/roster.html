@@ -2,6 +2,25 @@
 
 {% block content %}   
 
+
+{% for group in user.groups.all %}
+    {% if group.name == 'coaches' %}
+        <div class="pure-menu pure-menu-horizontal">
+            
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>
+
+                <li class="pure-menu-item"><a href="{% url 'attendance:coach_dashboard' %}" class="pure-menu-link"><i class="fa fa-dashboard fa-2x" aria-hidden="true"></i>  dashboard</a></li>
+
+                <li class="pure-menu-item">
+                    <a href="{% url 'attendance:auth_logout' %}" class="pure-menu-link"><i class="fa fa-sign-out fa-2x" aria-hidden="true"></i> sign out</a>
+                </li>
+
+            </ul>
+        </div>
+    {% endif %}
+{% endfor %} 
+
     <div class="table-data pure-menu pure-menu-horizontal">
 
         <h1> {{class}} with <a href="{% url 'attendance:classes_for_coach' coach_id=coach.coach_id%}">{{coach}}</a></h1>

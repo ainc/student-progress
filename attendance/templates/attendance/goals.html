@@ -7,7 +7,20 @@
         <div class="pure-menu pure-menu-horizontal">
             <p class="pure-menu-heading"><a class="pure-menu-link" href="{% url 'attendance:student_profile' student_id=student.student_id %}">{{student}}</a></p>
             <ul class="pure-menu-list">
+                
+                <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>
+
                 <li class="pure-menu-item"><a href="{% url 'attendance:set_goal' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-plus fa-2x" aria-hidden="true"></i> set goal</a></li>
+
+
+            </ul>
+        </div>
+    {%else%}
+
+        <div class="pure-menu pure-menu-horizontal">
+            <p class="pure-menu-heading">{{student}}</p>
+            <ul class="pure-menu-list">
+                <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i></a></li>
             </ul>
         </div>
     {% endif %}
