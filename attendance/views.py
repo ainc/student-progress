@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse, resolve
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian, Team, TeamMember
+from .models import Enrollment, Coach, Student, ClassSession, AttendanceRecord, Class, StudentProfile, StudentGoal, CoachNote, Skill, Subskill, StudentProgress, Relationship, StudentGuardian, Team, TeamMember, PassPhrase
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User, Group
@@ -410,7 +410,7 @@ def coach_signup(request):
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
 			
-		if request.POST['coach_phrase'] == 'rule #22':
+		if request.POST['coach_phrase'] == PassPhrase.objects.get(pk=1).pass_phrase:
 			
 			try:
 
@@ -826,9 +826,10 @@ def coach_verify(request):
 
 			return resolve('accounts/github/login')
 		else:
-			return render(request, 'attendance/coach_verify.html', {'wrong_phrase': True})
+			pass_phrase = PassPhrase.objects.get(pk=1)
+			return render(request, 'attendance/coach_verify.html', {'wrong_phrase': True, 'pass_phrase': PassPhrase.objects.get(pk=1).pass_phrase})
 
 	request.session['coach_signup'] = True
 
-	return render(request, 'attendance/coach_verify.html')
+	return render(request, 'attendance/coach_verify.html', { 'pass_phrase': PassPhrase.objects.get(pk=1).pass_phrase})
 

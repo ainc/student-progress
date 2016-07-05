@@ -18,7 +18,7 @@
         $(document).ready(function(){
            $("#submit").attr("disabled", "true");  
            $('#coach_phrase').keyup(function() {
-                if ($(this).val() == "rule #22") {
+                if ($(this).val() == '{{pass_phrase}}') {
                     $("#submit").removeAttr("disabled");
                 } else {
                     $("#submit").attr("disabled", "true");        
@@ -34,7 +34,7 @@
     <form class="pure-form pure-form-stacked" action="{% provider_login_url "github" %}" method="post">
             {% csrf_token %}
     <fieldset>
-        <legend class="legend"><h1> Enter coach passphrase </h1></legend>
+        <legend class="legend"><h1> Enter coach passphrase</h1></legend>
 
         <label for="coach_phrase">Coach key</label>
         <input name="coach_phrase" id="coach_phrase" type="password" placeholder="Ask Nick" required>

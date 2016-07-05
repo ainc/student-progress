@@ -232,4 +232,8 @@ class AttendanceRecord(models.Model):
 	def did_attend(self):
 		return self.attended
 
+
+class PassPhrase(models.Model):
+	pass_id = models.AutoField(primary_key=True)
+	pass_phrase = models.CharField(max_length=30)
 	
