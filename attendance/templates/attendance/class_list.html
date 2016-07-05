@@ -34,11 +34,11 @@
 
             <tbody>
 
-                {% for class in classes %}
+                {% for entry_dict in classes %}
 
                 <tr>
                     <td> Lead </td>
-                    <td> <a href="{% url 'attendance:class_roster' class_id=class.class_id coach_id=coach.coach_id %}"> {{ class.class }} </a> </td>
+                    <td> <a href="{% url 'attendance:class_roster' class_id=entry_dict.class.class_id coach_id=entry_dict.head_coach.coach_id %}"> {{ entry_dict.class }} </a> </td>
                     
                 </tr>
 

@@ -53,7 +53,7 @@ Coaches methods
 @user_passes_test(group_check)
 def class_roster(request, coach_id, class_id):
 	if not has_access(request, coach_id, class_id):
-		return HttpResponse('not authorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -65,7 +65,7 @@ def class_roster(request, coach_id, class_id):
 @user_passes_test(group_check)
 def class_session(request, coach_id, class_id, session_id):
 	if not has_access(request, coach_id, class_id):
-		return HttpResponse('not authorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -114,13 +114,10 @@ def classes_for_coach(request, coach_id):
 	coach = get_object_or_404(Coach, pk=coach_id)
 	#This query will return a dictionary of all the unique classes this coach teaches
 	classDicts = ClassSession.objects.filter(coach=coach).values('_class').distinct()
+	teams = Team.objects.filter(head_coach=coach)
 	classes = []
-	#For all those dicts, we'll extract and lookup the actual class
-	for value in classDicts:
-		entryDict = {}
-		entryDict["class"] = Class.objects.get(pk=value['_class'])
-		entryDict["class_id"] = value['_class']
-		classes.append(entryDict)
+	for entry in teams:
+		classes.append({'head_coach': entry.head_coach, 'class': entry._class})
 
 	#For all the classes where our coach is an assistant, we'll go through and store those values too
 	assistant_classes = []
@@ -138,7 +135,7 @@ def classes_for_coach(request, coach_id):
 @user_passes_test(group_check)
 def class_overview(request, class_id, coach_id):
 	if not has_access(request, coach_id, class_id):
-		return HttpResponse('not authorized')
+		return render(request, 'attendance/unauthorized.html', {})
 	#Get the coach, class, and students
 	coach = get_object_or_404(Coach, pk=coach_id)
 	clas = get_object_or_404(Class, pk=class_id)
@@ -461,7 +458,7 @@ def coach_dashboard(request):
 		coach_dict = {}
 		coach_dict['coach'] = coach
 		#This query will return a dictionary of all the unique classes this coach teaches
-		classes = ClassSession.objects.filter(coach=coach).values('_class').distinct()
+		classes = Team.objects.filter(head_coach=coach)
 		coach_dict['classes'] = classes
 		teams = TeamMember.objects.filter(assistant_coach=coach)
 		coach_dict['num'] = len(classes)
