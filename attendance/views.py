@@ -235,7 +235,6 @@ def signup(request):
 
 #View for a standard login page
 def login(request):
-	print('login')
 	#post will authenticate a user 
 	if request.method == 'POST':
 		username = request.POST['username']
@@ -295,14 +294,14 @@ def student_profile(request, student_id):
 		if hasattr(user, 'studentguardian'):
 
 			if not Relationship.objects.filter(student=student, guardian=user.studentguardian, student_approved=True):
-				return HttpResponse('You do not have access to this page yet')
+				return render(request, 'attendance/unauthorized.html', {'error_message': 'You dont have access to this page yet'})
 
 		#Kick any student's that are trying to access this page without permission
 
 		if hasattr(user, 'studentprofile'):
 
 			if user.studentprofile.student != student:
-				return HttpResponse('Unauthorized')
+				return render(request, 'attendance/unauthorized.html', {})
 				
 
 		profile = student.profile
@@ -374,10 +373,10 @@ def update_profile(request, student_id):
 
 		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 	#No precious, they musnt access this page 
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 #View for viewing student notes
 @login_required
@@ -400,7 +399,7 @@ def student_notes(request, student_id):
 			return render(request, 'attendance/notes.html', {'student': student, 'notes': notes})
 	#No precious, they musnt access this page 
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 
 #Have a view for coaches to signup
@@ -496,9 +495,9 @@ def add_relation(request, guardian_id):
 				students = Student.objects.all()
 				return render(request, 'attendance/guardian_reg.html', {'guardian': guardian, 'students': students})
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 
 #View to pull up a parent's main page
@@ -517,9 +516,9 @@ def parent_home(request, guardian_id):
 			return render(request, 'attendance/parent_home.html', {'guardian': guardian, 'students': my_students })
 
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 	
 #For the leave note view we make the user has coach permissions
 @user_passes_test(group_check)
@@ -536,7 +535,7 @@ def leave_note(request, student_id):
 			return render(request, 'attendance/leave_note.html', {'student': student})
 
 	else: 
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 
 
@@ -566,10 +565,10 @@ def set_goal(request, student_id):
 
 		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 	#No precious, they musnt access this page 
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 #View for editing a student profile 
 @login_required
@@ -597,10 +596,10 @@ def mark_goal(request, student_id, goal_id):
 
 		#If not the user, show them an unauthorized message. Filthy trickses, nasty hobbitses
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 	#No precious, they musnt access this page 
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 
 #For the enrollment view we will grab the coach and the class, then show a list of all students that can be enrolled
@@ -810,14 +809,14 @@ def approve_parent(request, student_id):
 
 
 			else:
-				return HttpResponse('Unauthorized')
+				return render(request, 'attendance/unauthorized.html', {})
 
 
 		else:
-			return HttpResponse('Unauthorized')
+			return render(request, 'attendance/unauthorized.html', {})
 
 	else:
-		return HttpResponse('Unauthorized')
+		return render(request, 'attendance/unauthorized.html', {})
 
 
 

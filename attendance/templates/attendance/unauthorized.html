@@ -1,0 +1,25 @@
+{% extends 'attendance/profile-base.html' %}
+
+{% block content %} 
+
+<div align="center">
+
+    <h1> Unauthorized </h1>
+
+    {%if error_message%}
+        <h2> {{error_message}} </h2>
+    {%else%}
+        <h2> You don't have access to this page </h2>
+
+    {%endif%}
+    
+    <input type=button value="Previous Page" onClick="javascript:history.go(-1);">
+
+
+
+</div>
+
+
+
+{% endblock %}
+

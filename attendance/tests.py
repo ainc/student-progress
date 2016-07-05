@@ -1,98 +1,136 @@
-from django.test import TestCase
+from django.test import TestCase, Client, RequestFactory
+from django.contrib.auth.models import User, Group
 import datetime
+from . import views
 
 #Basic attendance testing
 
-from .models import Coach, Student, Class, ClassSession, AttendanceRecord
+from .models import Coach, Student, StudentProfile, StudentGuardian, Relationship, Enrollment, CoachNote, StudentGoal, Class, ClassSession, AttendanceRecord, Team, TeamMember, Skill, Subskill
 
+from django.contrib.sessions.middleware import SessionMiddleware
 
-class AttendanceTests(TestCase):
+def add_session_to_request(request):
+    """Annotate a request object with a session"""
+    middleware = SessionMiddleware()
+    middleware.process_request(request)
+    request.session.save()
 
-	def createCoach(self):
-		return Coach.objects.create(first_name='Coach', last_name='One')
+class StudentProgress(TestCase):
+
+	def setUp(self):
+		self.factory = RequestFactory(enforce_csrf_checks=True)
+		self.user = User.objects.create_user(username='jacob', email='jacob@…', password='top_secret')
+		self.profile = StudentProfile.objects.create(user=self.user, bio='hello world')
+		self.student = Student.objects.create(profile=self.profile, first_name='jacob', last_name='miller')
+		self.c = Client()
+		self.skill = Skill.objects.create(title='django')
+		self.subskill = Subskill.objects.create(skill=self.skill, description='Learn automated testing')
+
+		self.coach_user = User.objects.create_user(username='jon', email='jon@…', password='top_secret')
+		
+		group = Group.objects.create(name='coaches')
+		self.coach_user.groups.add(group)
+		self.coach = Coach.objects.create(user=self.coach_user, first_name='Jon', last_name='Hzovanic')
+
+		self.new_class = Class.objects.create(class_name='Test')
+
+    #Tests that don't require an authenticated user
+	def test_get_home(self):
+		response = self.c.get('/', {})
+		self.assertEqual(response.status_code, 200)
+
+	def test_get_login(self):
+		response = self.c.get('/login/', {})
+		self.assertEqual(response.status_code, 200)
 	
-	def createStudent(self):
-		return Student.objects.create(first_name='Student', last_name='One')
+	def test_get_signup(self):
+		response = self.c.get('/signup/', {})
+		self.assertEqual(response.status_code, 200)
 
-	def createClass(self):
-		return Class.objects.create(class_name='iOS')
+	def test_get_coaches_signup(self):
+		response = self.c.get('/signup/coaches/', {})
+		self.assertEqual(response.status_code, 200)
 
-	def createAttendanceRecord(self, coach_param, student_param, class_param, session_param, attendance_param):
-		return AttendanceRecord.objects.create(coach=coach_param, student=student_param, _class=class_param, session=session_param, attended=attendance_param)
+	#Tests that require a logged in user
 
-	def create_session_for_today(self, coach_param, class_param):
-		return ClassSession.objects.create(coach=coach_param, _class=class_param, class_date=datetime.datetime.now())
+	def test_student_login(self):
+		request = self.factory.get('/student/' + str(self.student.student_id))
 
-	def create_session_at_seven_am(self, coach_param, class_param):
-		return ClassSession.objects.create(coach=coach_param, _class=class_param, class_date=datetime.datetime(2016, 5, 24, 7, 45))
+		# Recall that middleware are not supported. You can simulate a
+		# logged-in user by setting request.user manually.
+		request.user = self.user
 
-	def create_session_at_noon(self, coach_param, class_param):
-		return ClassSession.objects.create(coach=coach_param, _class=class_param, class_date=datetime.datetime(2016, 5, 24, 12, 00))
+		# Test my_view() as if it were deployed at /customer/details
+		response = views.student_profile(request, self.student.student_id)
+		self.assertEqual(response.status_code, 200)
 
-	def create_session_at_six_pm(self, coach_param, class_param):
-		return ClassSession.objects.create(coach=coach_param, _class=class_param, class_date=datetime.datetime(2016, 5, 24, 18, 00))
+	def test_coach_login(self):
+		request = self.factory.get('/coach/' + str(self.coach.coach_id))
 
-	def test_coach(self):
-		coach = self.createCoach()
-		self.assertTrue(isinstance(coach, Coach))
-		self.assertEqual('Coach', coach.first_name)
-		self.assertEqual('One', coach.last_name)
+		# Recall that middleware are not supported. You can simulate a
+		# logged-in user by setting request.user manually.
+		request.user = self.coach_user
 
-	def test_student(self):
-		s = self.createStudent()
-		self.assertTrue(isinstance(s, Student))
-		self.assertEqual('Student', s.first_name)
-		self.assertEqual('One', s.last_name)
+		# Test my_view() as if it were deployed at /customer/details
+		response = views.classes_for_coach(request, self.coach.coach_id)
+		self.assertEqual(response.status_code, 200)
 
-	def test_class(self):
-		c = self.createClass()
-		self.assertTrue(isinstance(c, Class))
-		self.assertEqual('iOS', c.class_name)
+	def test_coach_dashboard(self):
+		request = self.factory.get('/coach/dashboard/')
 
-	def test_session(self):
-		coach = self.createCoach()
-		clas = self.createClass()
-		c = self.create_session_at_noon(coach, clas)
-		self.assertTrue(isinstance(c, ClassSession))
+		# Recall that middleware are not supported. You can simulate a
+		# logged-in user by setting request.user manually.
+		request.user = self.coach_user
 
-	def test_noon(self):
-		coach = self.createCoach()
-		clas = self.createClass()
-		c = self.create_session_at_noon(coach, clas)
-		self.assertEqual(12, c.class_date.hour)
-		self.assertEqual(0, c.class_date.minute)
-		self.assertEqual('05/24/16 12:00', c.formatted_time())
+		# Test my_view() as if it were deployed at /customer/details
+		response = views.coach_dashboard(request)
+		self.assertEqual(response.status_code, 200)
 
-	def test_six_pm(self):
-		coach = self.createCoach()
-		clas = self.createClass()
-		c = self.create_session_at_six_pm(coach, clas)
-		self.assertEqual(18, c.class_date.hour)
-		self.assertEqual(0, c.class_date.minute)
-		self.assertEqual('05/24/16 06:00', c.formatted_time())
+	def test_post_login(self):
 
-	def test_seven_am(self):
-		coach = self.createCoach()
-		clas = self.createClass()
-		c = self.create_session_at_seven_am(coach, clas)
-		self.assertEqual(7, c.class_date.hour)
-		self.assertEqual(45, c.class_date.minute)
-		self.assertEqual('05/24/16 07:45', c.formatted_time())
+		request = self.factory.post('/login/', {'username': 'jacob', 'password': 'top_secret'})
+		add_session_to_request(request)
 
-	def test_attendance_false(self):
-		coach = self.createCoach()
-		stud = self.createStudent()
-		clas = self.createClass()
-		sess = self.create_session_at_noon(coach, clas)
-		rec = self.createAttendanceRecord(coach, stud, clas, sess, False)
-		self.assertEqual(rec.attended, False)
-		self.assertEqual(rec.did_attend(), False)
+		response = views.login(request)
+		self.assertEqual(response.status_code, 302)
 
-	def test_attendance_true(self):
-		coach = self.createCoach()
-		stud = self.createStudent()
-		clas = self.createClass()
-		sess = self.create_session_at_noon(coach, clas)
-		rec = self.createAttendanceRecord(coach, stud, clas, sess, True)
-		self.assertEqual(rec.did_attend(), True)
+		request = self.factory.post('/login/', {'username': 'jon', 'password': 'top_secret'})
+		add_session_to_request(request)
+
+		response = views.login(request)
+		self.assertEqual(response.status_code, 302)
+
+	def test_leave_note(self):
+		request = self.factory.post('/student/' + str(self.student.student_id) + '/notes/leave', {'note': '12345'})
+		request.user = self.coach_user
+		add_session_to_request(request)
+
+		response = views.leave_note(request, self.student.student_id)
+		note = CoachNote.objects.get(pk=1)
+		self.assertEqual('12345', note.note)
+		self.assertEqual(response.status_code, 302)
+
+
+	def test_set_goal(self):
+		request = self.factory.post('/student/' + str(self.student.student_id) + '/goals/set', {'goal': '12345'})
+		request.user = self.user
+		add_session_to_request(request)
+
+		response = views.set_goal(request, self.student.student_id)
+		goal = StudentGoal.objects.get(pk=1)
+		self.assertEqual('12345', goal.description)
+		self.assertEqual(response.status_code, 302)
+
+	def test_enroll_student(self):
+		request = self.factory.post('/coach/' + str(self.coach.coach_id) + '/enroll/' + str(self.new_class.class_id) + '/', {'student': [self.student.student_id]})
+		request.user = self.coach_user
+		add_session_to_request(request)
+
+		response = views.enroll(request, self.coach.coach_id, self.new_class.class_id)
+		enroll = Enrollment.objects.get(student=self.student)
+		self.assertEqual(self.student, enroll.student)
+		self.assertEqual(response.status_code, 302)
+
+
+
 
