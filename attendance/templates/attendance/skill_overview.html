@@ -26,6 +26,15 @@
 
     {% endfor %} 
 
+    {% if request.user.studentprofile.student.student_id == student.student_id %}
+       <div class="pure-menu pure-menu-horizontal">
+           <ul class="pure-menu-list">
+               <li class="pure-menu-item"><a href="{% url 'attendance:student_skills' student_id=student.student_id %}" class="pure-menu-link"><i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> back</a></li>
+
+           </ul>
+       </div>
+   {% endif %}
+
           
 
     <style>
