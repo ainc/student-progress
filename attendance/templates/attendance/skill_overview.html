@@ -56,9 +56,9 @@
         </div>
     </div>
 
-
-    {% for subskill in subskills %}
-
+{% for level, subskill_list in subskills.items%}
+    <h1 align="center"> Level: {{level}} </h1>
+    {% for subskill in subskill_list %}
 
       {% if subskill.achieved %}
 
@@ -120,5 +120,6 @@
       {% endif %}
 
     {% endfor %}
+{%endfor%}
 
 {% endblock %}

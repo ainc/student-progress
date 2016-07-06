@@ -156,6 +156,7 @@ class Subskill(models.Model):
 	sub_id = models.AutoField(primary_key=True)
 	description = models.CharField(max_length=1000)
 	skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+	level = models.IntegerField(default=0)
 
 	def __str__(self):
 		return str(self.skill) + ' -- ' + self.description
@@ -236,4 +237,4 @@ class AttendanceRecord(models.Model):
 class PassPhrase(models.Model):
 	pass_id = models.AutoField(primary_key=True)
 	pass_phrase = models.CharField(max_length=30)
-	
+

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth import login as login_user
 from django.db import IntegrityError
 from allauth.socialaccount.models import SocialToken
+import collections
 
 # Create your views here.
 from datetime import datetime
@@ -715,12 +716,17 @@ def skill_overview(request, student_id, skill_id):
 	skill = get_object_or_404(Skill, pk=skill_id)
 
 	#Grab all the subskills and all the ones the student has met
-	subskills = Subskill.objects.filter(skill=skill)
+	subskills = Subskill.objects.filter(skill=skill).order_by('level')
 	student_met = StudentProgress.objects.filter(student=student, achieved=True).values_list('subskill', flat=True)
 
 	subskill_list = []
+	level_dict = {}
+	level = -1
 	#Go through all the subskills 
 	for subskill in subskills:
+		if subskill.level > level:
+			level += 1
+			level_dict[level] = []
 		#Create a dict that holds the subskill and if it was achieved
 		subskill_dict = {}
 		if subskill.sub_id in student_met:
@@ -729,10 +735,14 @@ def skill_overview(request, student_id, skill_id):
 			subskill_dict['achieved'] = False
 
 		subskill_dict['subskill'] = subskill
+		
 
 		#Append that dict to the list of subskills
-		subskill_list.append(subskill_dict)
+		level_dict[subskill.level].append(subskill_dict)
 
+	subskill_list = level_dict
+
+	print(subskill_list)
 	return render(request, 'attendance/skill_overview.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
 @login_required
