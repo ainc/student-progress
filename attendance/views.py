@@ -725,7 +725,7 @@ def skill_overview(request, student_id, skill_id):
 	#Go through all the subskills 
 	for subskill in subskills:
 		if subskill.level > level:
-			level += 1
+			level = subskill.level
 			level_dict[level] = []
 		#Create a dict that holds the subskill and if it was achieved
 		subskill_dict = {}
@@ -742,7 +742,6 @@ def skill_overview(request, student_id, skill_id):
 
 	subskill_list = level_dict
 
-	print(subskill_list)
 	return render(request, 'attendance/skill_overview.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
 @login_required
