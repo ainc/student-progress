@@ -9,6 +9,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 		
 		user = super(SocialAccountAdapter, self).save_user(request, sociallogin, form)
 
+
 		profile_img_url = sociallogin.account.extra_data['avatar_url']
 
 		#If this is a coach signing up then we'll create a coach account for them 
@@ -21,7 +22,12 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 			user.save()
 			return user
 		#Create our student here
-		profile = StudentProfile.objects.create(email=user.email, user=user, github_user_name=user.username, bio=sociallogin.account.extra_data['bio'], profile_img_url=profile_img_url)
+		bio = ''
+		if sociallogin.account.extra_data['bio']:
+			bio = sociallogin.account.extra_data['bio']
+		else:
+			bio = 'Bio'
+		profile = StudentProfile.objects.create(email=user.email, user=user, github_user_name=user.username, bio=bio, profile_img_url=profile_img_url)
 		Student.objects.create(first_name=user.first_name, last_name='', profile=profile)
 		
 		return user
