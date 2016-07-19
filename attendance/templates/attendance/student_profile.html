@@ -6,6 +6,19 @@
 
 <section class="dashboard">
 
+    {% for group in user.groups.all %}
+        {% if group.name == 'coaches' %}
+            <div class="pure-menu pure-menu-horizontal">
+                <p class="pure-menu-heading">{{user.coach}}</p>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>                  
+                </ul>
+            </div>
+        {% endif %}
+
+    {% endfor %} 
+
+
     {% if request.user.studentprofile.student.student_id == student.student_id %}
         <div class="pure-menu pure-menu-horizontal">
             <p class="pure-menu-heading">My profile</p>

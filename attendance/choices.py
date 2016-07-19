@@ -1,6 +1,7 @@
 ICON_CHOICES = (
 
 (	'fa-android', 'fa-android'), 
+(	'fa-gamepad', 'fa-gamepad'), 
 (	'fa-apple', 'fa-apple'), 
 (	'fa-mobile', 'fa-mobile'), 
 (	'fa-stack-overflow', 'fa-stack-overflow'), 
@@ -18,6 +19,13 @@ ICON_CHOICES = (
 (	'fa-cloud', 'fa-cloud'), 
 (	'fa-server', 'fa-server'), 
 (	'fa-jsfiddle', 'fa-jsfiddle'), 
-(	'fa-linux', 'fa-linux')
+(	'fa-linux', 'fa-linux'),
+(	'fa-trophy', 'fa-trophy'), 
+(	'fa-graduation-cap', 'fa-graduation-cap'), 
+(	'fa-line-chart', 'fa-line-chart'), 
+(	'fa-bar-chart', 'fa-bar-chart'), 
+(	'fa-pie-chart', 'fa-pie-chart'), 
+(	'fa-diamond', 'fa-diamond'), 
+(	'fa-coffee', 'fa-coffee'), 
 
 )

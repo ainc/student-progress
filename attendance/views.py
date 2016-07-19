@@ -9,6 +9,7 @@ from django.contrib.auth import login as login_user
 from django.db import IntegrityError
 from allauth.socialaccount.models import SocialToken
 import collections
+from decimal import Decimal
 
 # Create your views here.
 from datetime import datetime
@@ -323,8 +324,10 @@ def student_profile(request, student_id):
 		skills = Subskill.objects.all()
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
 
+		percentage = round(Decimal(len(skills_met)/len(skills)),2)*100
+
 		new_relations = Relationship.objects.filter(student=student, student_approved=False)
-		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': '{0:.2f}'.format(float(len(skills_met)/len(skills))*100), 'new_relations': len(new_relations), 'github_username': github_username})
+		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': percentage, 'new_relations': len(new_relations), 'github_username': github_username})
 
 	else:
 		return render(request, 'attendance/login.html')
@@ -672,8 +675,6 @@ def mark_skill(request, student_id, skill_id):
 			#Grab this particular progress object, if it exists
 			progress_obj = StudentProgress.objects.filter(student=student, subskill=subskill)
 
-			print(request.POST.getlist('achieved'))
-
 			#If that skill id is not in the achieved column, then we'll either create a new progress object and mark it as not achieved, or we'll update it
 			if str(subskill.sub_id) not in request.POST.getlist('achieved'):
 				if not progress_obj:
@@ -715,8 +716,6 @@ def mark_skill(request, student_id, skill_id):
 			#Append that dict to the list of subskills
 			subskill_list.append(subskill_dict)
 
-
-		print(subskill_list)
 
 		return render(request, 'attendance/mark_skill.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
@@ -786,8 +785,6 @@ def student_skills(request, student_id):
 		#Add them to the final list 
 		skill_list.append(skill_dict)
 
-	print(skill_list)
-	
 	return render(request, 'attendance/skills.html', {'student': student, 'skills': skill_list})
 
 
