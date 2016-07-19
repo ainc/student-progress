@@ -325,6 +325,9 @@ def student_profile(request, student_id):
 		skills_met = StudentProgress.objects.filter(student=student, achieved=True)
 
 		percentage = round(Decimal(len(skills_met)/len(skills)),2)*100
+		print(percentage)
+		print(len(skills))
+		print(len(skills_met))
 
 		new_relations = Relationship.objects.filter(student=student, student_approved=False)
 		return render(request, 'attendance/student_profile.html', {'student': student, 'profile': profile, 'upcoming': upcoming_sessions, 'num_upcoming': num_upcoming, 'goals_met': len(goals_met), 'goals_set': len(goals_set), 'notes': len(notes), 'skills': len(skills), 'skills_met': len(skills_met), 'percent_complete': percentage, 'new_relations': len(new_relations), 'github_username': github_username})
