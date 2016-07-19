@@ -1,6 +1,33 @@
 {% extends 'attendance/base.html' %}
 
-{% block content %}   
+{% block content %}  
+
+
+{% for group in user.groups.all %}
+        {% if group.name == 'coaches' %}
+            <div class="pure-menu pure-menu-horizontal">
+                <p class="pure-menu-heading">You are currently logged in, {{user.coach}}</p>
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a href="{% url 'attendance:classes_for_coach' coach_id=user.coach.coach_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i>  home</a></li>                  
+                </ul>
+            </div>
+        {% endif %}
+
+{% endfor %} 
+
+
+    {% if request.user.studentprofile.student%}
+        <div class="pure-menu pure-menu-horizontal">
+            <p class="pure-menu-heading">You are currently logged in</p>
+            <ul class="pure-menu-list">
+                
+                <li class="pure-menu-item"><a href="{% url 'attendance:student_profile' student_id=request.user.studentprofile.student.student_id %}" class="pure-menu-link"><i class="fa fa-home fa-2x" aria-hidden="true"></i> home</a></li>
+
+
+            </ul>
+
+        </div>
+    {%endif%}
 
 
 <div class="banner" align="center">
