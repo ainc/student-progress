@@ -33,6 +33,7 @@
                     <th>Last name</th>
                     <th> Email </th>
                     <th> Profile </th>
+                    <th> Remove </th>
                 </tr>
             </thead>
 
@@ -46,6 +47,7 @@
                     <td> {{ record.student.last_name }}  </td>
                     <td> {{ record.student.profile.email }} </td>
                     <td> <a href="{% url 'attendance:student_profile' student_id=record.student_id %}"> Profile </a> </td> 
+                    <td> <a href="{% url 'attendance:remove_student' coach_id=coach.coach_id  class_id=class.class_id student_id=record.student_id %}" class="pure-menu-link"><i class="fa fa-trash-o" aria-hidden="true"></i>  </a> </td>
                 </tr>
 
                 {% endfor %}

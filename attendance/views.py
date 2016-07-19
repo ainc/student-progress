@@ -648,6 +648,28 @@ def create_session(request, coach_id, class_id):
 		return render(request, 'attendance/create_session.html', {'coach':coach, 'students':all_students, 'class':clas})
 
 
+
+@user_passes_test(group_check)
+def remove_student(request, coach_id,class_id, student_id):
+
+
+	#Now reload the page
+	if not has_access(request, coach_id, class_id):
+		return render(request, 'attendance/unauthorized.html', {})
+
+	coach = get_object_or_404(Coach, pk=coach_id)
+	clas = get_object_or_404(Class, pk=class_id)
+	student= get_object_or_404(Student, pk=student_id)
+
+	#Delete the student
+	Enrollment.objects.filter(coach=coach, student=student, _class=clas).delete()
+
+	query_set = Enrollment.objects.filter(coach=coach, _class=clas)
+
+	return render(request, 'attendance/roster.html', {'roster': query_set, 'coach': coach, 'class': clas})
+
+
+
 @login_required
 def student_goals(request, student_id):
 

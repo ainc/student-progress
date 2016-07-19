@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^student/(?P<student_id>\d+)/skill/(?P<skill_id>\d+)/subskills/mark/$', views.mark_skill, name='mark_skill'),
     url(r'^guardian/(?P<guardian_id>\d+)/add_relation/$', views.add_relation, name='add_relation'),
     url(r'^guardian/(?P<guardian_id>\d+)/home/$', views.parent_home, name='parent_home'),
+    url(r'^coach/(?P<coach_id>\d+)/roster/(?P<class_id>\d+)/student/(?P<student_id>\d+)/remove/$', views.remove_student, name='remove_student'),
 
  ]
