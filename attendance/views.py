@@ -654,41 +654,51 @@ def student_goals(request, student_id):
 	return render(request, 'attendance/goals.html', {'student':student, 'goals': goals})
 
 
+
+#View that appears when a coach goes into a student profile and marks student progress
 @user_passes_test(group_check)
 def mark_skill(request, student_id, skill_id):
 	student = get_object_or_404(Student, pk=student_id)
 	skill = get_object_or_404(Skill, pk=skill_id)
 
+	#Grab all the subskills for this particular skill
+	subskills_for_skill = Subskill.objects.filter(skill=skill)
+
 	if request.method == 'POST':
-		#For all the skill ids that were marked achieved, we'll create a new student progress entry 
-		for skill_id in request.POST.getlist('achieved'):
-			subskill = get_object_or_404(Subskill, pk=int(skill_id))
-			
-			progress = StudentProgress.objects.filter(subskill=subskill, student=student)
-			
-			#If there is no progress object, then we'll need to create a new one
-			if not progress:
-				StudentProgress.objects.create(student=student, achieved=True, subskill=subskill)
+
+		#For all the subskills for this particular skill
+		for subskill in subskills_for_skill:
+
+			#Grab this particular progress object, if it exists
+			progress_obj = StudentProgress.objects.filter(student=student, subskill=subskill)
+
+			print(request.POST.getlist('achieved'))
+
+			#If that skill id is not in the achieved column, then we'll either create a new progress object and mark it as not achieved, or we'll update it
+			if str(subskill.sub_id) not in request.POST.getlist('achieved'):
+				if not progress_obj:
+					StudentProgress.objects.create(student=student, achieved=False, subskill=subskill)
+
+				else:
+					#Update the first object returned
+					progress_obj[0].achieved = False
+					progress_obj[0].save()
 			else:
-				progress[0].achieved = True
-				progress[0].save()
+				if not progress_obj:
+					StudentProgress.objects.create(student=student, achieved=True, subskill=subskill)
 
-
-		#Now grab all the progress objects
-		student_progress = StudentProgress.objects.filter(student=student)
-
-		#For all of the student progress objects that aren't in the achieved tab, we'll mark them as unachieved
-		for row in student_progress:
-			if str(row.subskill.sub_id) not in request.POST.getlist('achieved'):
-				row.achieved = False
-				row.save()
-
+				else:
+					#Update the first object returned 
+					progress_obj[0].achieved = True
+					progress_obj[0].save()
 
 		return HttpResponseRedirect(reverse('attendance:skill_overview', args=(student_id, skill.skill_id)))
+	
 	else:
 		#Grab all the subskills and all the ones the student has met
 		subskills = Subskill.objects.filter(skill=skill)
 		student_met = StudentProgress.objects.filter(student=student, achieved=True).values_list('subskill', flat=True)
+
 
 		subskill_list = []
 		#Go through all the subskills 
@@ -705,13 +715,18 @@ def mark_skill(request, student_id, skill_id):
 			#Append that dict to the list of subskills
 			subskill_list.append(subskill_dict)
 
+
+		print(subskill_list)
+
 		return render(request, 'attendance/mark_skill.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
 
-	
 
+
+#View that shows a student's overall progress for a particular skill
 @login_required
 def skill_overview(request, student_id, skill_id):
+	#Get this student, and get this particular skill
 	student = get_object_or_404(Student, pk=student_id)
 	skill = get_object_or_404(Skill, pk=skill_id)
 
@@ -744,6 +759,8 @@ def skill_overview(request, student_id, skill_id):
 
 	return render(request, 'attendance/skill_overview.html', {'student':student, 'skill': skill, 'subskills': subskill_list})
 
+
+#View that shows an overview of all the skills and this students progress towards achieving them
 @login_required
 def student_skills(request, student_id):
 
@@ -758,8 +775,9 @@ def student_skills(request, student_id):
 		skill_dict = {}
 		skill_dict['skill'] = skill
 		
-		#Grab all the subskills and all the ones the student has met
+		#Grab all the subskills for this skill
 		subskills = Subskill.objects.filter(skill=skill)
+		#Now grab those this student has achieved
 		student_met = StudentProgress.objects.filter(subskill__skill=skill,student=student, achieved=True)
 
 		skill_dict['met'] = len(student_met)
@@ -768,6 +786,8 @@ def student_skills(request, student_id):
 		#Add them to the final list 
 		skill_list.append(skill_dict)
 
+	print(skill_list)
+	
 	return render(request, 'attendance/skills.html', {'student': student, 'skills': skill_list})
 
 
